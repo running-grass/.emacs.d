@@ -41,6 +41,8 @@
 ;; 保存了上一次打开文件时的光标位置
 (use-package saveplace
   :ensure nil
+  :init
+  (setq save-place-file "~/.emacs.d/.local/places")
   :hook (after-init . save-place-mode))
 
 ;; 高亮当前行
@@ -139,11 +141,8 @@
 	("SPC" . amx))
   )
 
-;; git最好的emacs工具
-(use-package magit
-  :bind
-  (:map global-leader-map
-	("g" . magit-status))
+(use-package ivy
+  :hook (after-init . ivy-mode)
   )
 
 ;; 快捷键提示
@@ -277,7 +276,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(editorconfig keyfreq wakatime-mode winum company which-key magit amx evil use-package)))
+   '(ivy editorconfig keyfreq wakatime-mode winum company which-key magit amx evil use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
