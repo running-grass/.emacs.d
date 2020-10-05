@@ -116,6 +116,22 @@
   :ensure nil
   :hook (after-init . global-auto-revert-mode))
 
+(use-package newcomment
+  :ensure nil
+  :bind (:map global-leader-map ( "cl" . comment-or-uncomment))
+  :config
+  (defun comment-or-uncomment ()
+    (interactive)
+    (if (region-active-p)
+        (comment-or-uncomment-region (region-beginning) (region-end))
+      (if (save-excursion
+            (beginning-of-line)
+            (looking-at "\\s-*$"))
+          (call-interactively 'comment-dwim)
+        (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
+  :custom
+  (comment-auto-fill-only-comments t))
+
 ;;;;;;;;;;;;;;;;;;;;;;  build-in mode ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -134,6 +150,7 @@
 
 ;; 设置amx，命令快速查找
 (use-package amx
+  :after (:any ivy)
   :init
   (setq amx-save-file "~/.emacs.d/.local/amx-items")
   :bind
