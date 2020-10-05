@@ -271,6 +271,15 @@
 	("SPC" . amx))
   )
 
+;; 快速跳转
+(use-package avy
+  :bind
+  (:map global-leader-map
+	("jj" . avy-goto-char-timer)
+	("jc" . avy-goto-char)
+	("jl" . avy-goto-line)
+	))
+
 ;; ivy智能提示后端
 (use-package ivy
   :init
