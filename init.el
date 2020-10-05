@@ -177,6 +177,7 @@
   (load-theme 'zenburn t)
   )
 
+
 ;; 安装icon管理
 (use-package all-the-icons)
 
@@ -227,6 +228,10 @@
 	("k" . evil-previous-line)
 	("h" . evil-backward-char)
 	("l" . evil-forwark-char)
+
+	:map global-leader-map
+	("wv" . evil-window-vsplit)
+	("wh" . evil-window-split)
   )
   )
 
@@ -278,6 +283,16 @@
   (global-company-mode 1)
   )
 
+;; 窗口切换
+(use-package window
+  :ensure nil
+  :bind
+  (:map global-leader-map
+	("wd" . delete-window)
+	("wo" . delete-other-windows)
+	)
+  )
+
 ;; 为窗口绑定序号
 (use-package winum
   :config
@@ -300,6 +315,17 @@
    ("8" . winum-select-window-8)
    ("9" . winum-select-window-9)
    )
+  )
+
+
+;; 窗口切换
+(use-package ace-window
+  :init
+  (setq aw-dispatch-always nil)
+  :bind
+  (:map global-leader-map
+	("ww" . ace-window)
+	)
   )
 
 ;; Org模式相关的，和GTD相关的
@@ -389,3 +415,19 @@
 
 (provide 'init)
 ;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(window zenburn-theme winum which-key wakatime-mode use-package super-save persistent-overlays org-superstar org-pomodoro keyfreq ivy evil-collection editorconfig company amx all-the-icons ace-window))
+ '(wakatime-cli-path
+   "/usr/local/Cellar/wakatime-cli/13.0.7/libexec/bin/wakatime")
+ '(wakatime-python-bin nil))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
