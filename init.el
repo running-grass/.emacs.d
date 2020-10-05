@@ -3,6 +3,8 @@
 
 ;;; Code:
 
+;; use-package初始化
+(progn
 ;; 引入package，以便使用package功能
 (require 'package)
 ;; 设置清华镜像仓库
@@ -12,12 +14,14 @@
 ;; 自动把包下载安装到.cache中
 (setq package-user-dir "~/.emacs.d/.cache/elpa")
 (package-initialize)
-
 ;; 自动安装use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+)
 
+;; 初始化一些全局变量
+(progn
 ;;关闭启动画面
 (setq inhibit-startup-message t)
 ;; 自动安装所有的包
@@ -27,8 +31,10 @@
 ;; 定义全局的leader-map
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
+)
 
-;;;;;;;;;;;;;;;;;;;;;;  build-in mode ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 内置模块的一些功能
+(progn
 ;; 窗口的撤销/恢复功能
 (use-package winner-mode
   :ensure nil
@@ -38,6 +44,7 @@
 	("wz" . winner-undo)
 	("wZ" . winner-redo)
 ))
+
 ;; 保存了上一次打开文件时的光标位置
 (use-package saveplace
   :ensure nil
@@ -54,9 +61,9 @@
 (use-package hideshow
   :ensure nil
   :diminish hs-minor-mode
-  :bind (:map prog-mode-map
-         ("C-c TAB" . hs-toggle-hiding)
-         ("M-+" . hs-show-all))
+  :bind (:map global-leader-map
+         ("TAB" . hs-toggle-hiding)
+         ("S-TAB" . hs-show-all))
   :hook (prog-mode . hs-minor-mode)
   :custom
   (hs-special-modes-alist
@@ -64,6 +71,13 @@
            '((c-mode "{" "}" "/[*/]" nil nil)
              (c++-mode "{" "}" "/[*/]" nil nil)
              (rust-mode "{" "}" "/[*/]" nil nil)))))
+
+;; 保存折叠状态
+(use-package persistent-overlays
+  :config
+  (setq persistent-overlays-directory "~/.emacs.d/.cache")
+  :hook (hs-minor-mode . persistent-overlays-minor-mode)
+  )
 
 ;; 显示空白字符
 (use-package whitespace
@@ -116,6 +130,7 @@
   :ensure nil
   :hook (after-init . global-auto-revert-mode))
 
+;; 注释/反注释
 (use-package newcomment
   :ensure nil
   :bind (:map global-leader-map ( "cl" . comment-or-uncomment))
@@ -131,9 +146,7 @@
         (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
   :custom
   (comment-auto-fill-only-comments t))
-
-;;;;;;;;;;;;;;;;;;;;;;  build-in mode ;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+)
 
 ;; 设置evil
 (use-package evil
@@ -158,6 +171,7 @@
 	("SPC" . amx))
   )
 
+;; ivy智能提示后端
 (use-package ivy
   :hook (after-init . ivy-mode)
   )
@@ -276,14 +290,21 @@
   (interactive)
   (load-file "~/.emacs.d/init.el"))
 
-
+;; 通用的快捷键绑定
+(progn
 (define-key global-leader-map "f" '("files"))
 (define-key global-leader-map "fe" '("emacs file"))
 (define-key global-leader-map "fei" '("打开Emacs配置文件" . gremacs/open-emacs-init))
 (define-key global-leader-map "fer" '("重新加载Emacs配置文件" . gremacs/load-emacs-init))
+(define-key global-leader-map "h" '("help"))
+(define-key global-leader-map "hd" '("describe"))
+(define-key global-leader-map "hdp" 'describe-package)
+(define-key global-leader-map "hdf" 'describe-function)
+(define-key global-leader-map "hdv" 'describe-variable)
+(define-key global-leader-map "hdk" 'describe-keymap)
 
 (define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
-
+)
 
 (provide 'init)
 ;; init.el ends here
@@ -293,7 +314,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ivy editorconfig keyfreq wakatime-mode winum company which-key magit amx evil use-package)))
+   '(persistent-overlays ivy editorconfig keyfreq wakatime-mode winum company which-key amx evil use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
