@@ -9,8 +9,7 @@
 (require 'package)
 ;; 设置清华镜像仓库
 (setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-			 ))
+                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
 ;; 自动把包下载安装到.cache中
 (setq package-user-dir "~/.emacs.d/.cache/elpa")
 (package-initialize)
@@ -52,6 +51,12 @@
   (setq save-place-file "~/.emacs.d/.local/places")
   :hook (after-init . save-place-mode))
 
+;; buffer相关的设置
+(use-package ibuffer
+  :bind
+  (:map global-leader-map
+	("bg" . ibuffer)))
+
 ;; 高亮当前行
 (use-package hl-line
   :ensure nil
@@ -60,11 +65,12 @@
 ;; 显示/隐藏结构化的数据
 (use-package hideshow
   :ensure nil
-  :diminish hs-minor-mode
   :hook (prog-mode . hs-minor-mode)
-  :bind (:map global-leader-map
+  :bind (
+	 :map evil-normal-state-map
+	 ;; :map global-leader-map
          ("TAB" . hs-toggle-hiding)
-         ("S-TAB" . hs-show-all))
+        )
   )
 
 ;; 保存折叠状态
@@ -187,25 +193,53 @@
 	("ocp" . org-pomodoro))
   )
 
+;; org标题美化
 (use-package org-superstar
   :after org
   :hook (org-mode . org-superstar-mode))
+
 ;; 设置evil
 (use-package evil
   :ensure t
   :init
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
+  :hook (after-init . evil-mode)
   :config
+  (progn
+  (evil-define-state move
+  "Test state."
+  :tag "<m>"
+  (message (if (evil-move-state-p)
+               "Enabling test state."
+             "Disabling test state.")))
+
+  (evil-set-initial-state 'org-agenda-mode 'move)
+
   (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
   (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
   (define-key evil-visual-state-map (kbd "SPC") global-leader-map)
   (define-key evil-emacs-state-map  (kbd "SPC") global-leader-map)
-  (evil-mode 1)
   )
+  :bind
+  (:map evil-move-state-map
+	("j" . evil-next-line)
+	("k" . evil-previous-line)
+	("h" . evil-backward-char)
+	("l" . evil-forwark-char)
+  )
+  )
+
+;; 为常用包配置evil按键
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
 
 ;; 设置amx，命令快速查找
 (use-package amx
-  :after (:any ivy)
+  :after ivy
   :init
   (setq amx-save-file "~/.emacs.d/.local/amx-items")
   :bind
@@ -216,7 +250,10 @@
 ;; ivy智能提示后端
 (use-package ivy
   :hook (after-init . ivy-mode)
-  )
+  :bind
+  (:map global-leader-map
+	("bb" . ivy-switch-buffer)
+	))
 
 ;; 快捷键提示
 (use-package which-key
@@ -352,19 +389,3 @@
 
 (provide 'init)
 ;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(org-superstar org-pomodoro all-the-icons zenburn-theme persistent-overlays ivy editorconfig keyfreq wakatime-mode winum company which-key amx evil use-package))
- '(wakatime-cli-path
-   "/usr/local/Cellar/wakatime-cli/13.0.7/libexec/bin/wakatime")
- '(wakatime-python-bin nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
