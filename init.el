@@ -28,25 +28,125 @@
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
 
+;;;;;;;;;;;;;;;;;;;;;;  build-in mode ;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 窗口的撤销/恢复功能
+(use-package winner-mode
+  :ensure nil
+  :hook (after-init . winner-mode)
+  :bind
+  (:map global-leader-map
+	("wz" . winner-undo)
+	("wZ" . winner-redo)
+))
+;; 保存了上一次打开文件时的光标位置
+(use-package saveplace
+  :ensure nil
+  :hook (after-init . save-place-mode))
+
+;; 高亮当前行
+(use-package hl-line
+  :ensure nil
+  :hook (after-init . global-hl-line-mode))
+
+;; 显示/隐藏结构化的数据
+(use-package hideshow
+  :ensure nil
+  :diminish hs-minor-mode
+  :bind (:map prog-mode-map
+         ("C-c TAB" . hs-toggle-hiding)
+         ("M-+" . hs-show-all))
+  :hook (prog-mode . hs-minor-mode)
+  :custom
+  (hs-special-modes-alist
+   (mapcar 'purecopy
+           '((c-mode "{" "}" "/[*/]" nil nil)
+             (c++-mode "{" "}" "/[*/]" nil nil)
+             (rust-mode "{" "}" "/[*/]" nil nil)))))
+
+;; 显示空白字符
+(use-package whitespace
+  :ensure nil
+  :hook (after-init . global-whitespace-mode)
+
+  :config
+    (face-spec-set 'whitespace-tab
+                 '((t :background unspecified)))
+  ;; For some reason use face-defface-spec as spec-type doesn't work.  My guess
+  ;; is it's due to the variables with the same name as the faces in
+  ;; whitespace.el.  Anyway, we have to manually set some attribute to
+  ;; unspecified here.
+  (face-spec-set 'whitespace-line
+                 '((((background light))
+                    :background "#d8d8d8" :foreground unspecified
+                    :underline t :weight unspecified)
+                   (t
+                    :background "#404040" :foreground unspecified
+                    :underline t :weight unspecified)))
+
+  ;; Use softer visual cue for space before tabs.
+  (face-spec-set 'whitespace-space-before-tab
+                 '((((background light))
+                    :background "#d8d8d8" :foreground "#de4da1")
+                   (t
+                    :inherit warning
+                    :background "#404040" :foreground "#ee6aa7")))
+
+  (setq
+   whitespace-line-column nil
+   whitespace-style
+   '(face		; visualize things below:
+     empty		; empty lines at beginning/end of buffer
+     lines-tail	; lines go beyond `fill-column'
+     space-before-tab	; spaces before tab
+     trailing           ; trailing blanks
+     tabs		; tabs (show by face)
+     tab-mark		; tabs (show by symbol)
+     ))
+  )
+
+;; 当某个文件的某一行特别长的时候，自动优化性能
+(use-package so-long
+  :ensure nil
+  :config (global-so-long-mode 1))
+
+;; 文件被外部程序修改后，重新载入buffer
+(use-package autorevert
+  :ensure nil
+  :hook (after-init . global-auto-revert-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;  build-in mode ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 ;; 设置evil
 (use-package evil
   :ensure t
   :init
   (setq evil-want-keybinding nil)
   :config
-  (evil-set-leader nil (kbd "C-SPC"))
   (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
   (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
   (define-key evil-visual-state-map (kbd "SPC") global-leader-map)
+  (define-key evil-emacs-state-map  (kbd "SPC") global-leader-map)
   (evil-mode 1)
   )
 
+;; 设置amx，命令快速查找
 (use-package amx
   :init
-  (setq amx-save-file "~/.emacs.d/.cache/amx-items")
-  :config (amx-mode))
-(use-package magit)
+  (setq amx-save-file "~/.emacs.d/.local/amx-items")
+  :bind
+  (:map global-leader-map
+	("SPC" . amx))
+  )
 
+;; git最好的emacs工具
+(use-package magit
+  :bind
+  (:map global-leader-map
+	("g" . magit-status))
+  )
+
+;; 快捷键提示
 (use-package which-key
   :init
   ;; 为define-key增加注释
@@ -63,111 +163,13 @@
   (which-key-mode)
   )
 
-;; 绑定大多数package的evil绑定
-(use-package evil-collection
-  :after evil
-  :ensure t
-  :config
-  (evil-collection-init))
-
-;; TLDR,快捷查看命令的用法
-(use-package tldr
-  :commands tldr
-  )
-
-(use-package general
-  :init
-  (setq general-override-states '(insert
-                                  emacs
-                                  hybrid
-                                  normal
-                                  visual
-                                  motion
-                                  operator
-                                  replace))
-  :config
-  (general-define-key
-   :states '(normal visual motion)
-   "," nil)
-
-  (general-create-definer global-leader-def
-    :prefix ",")
-
-  (global-leader-def
-
-    :states '(normal motion)
-    "SPC" 'amx
-
-
-    ;; files
-    "f f" 'find-file
-    "f e i" '(lambda ()
-	       (interactive)
-	       (find-file-existing "~/.emacs.d/init.el"))
-    "f e r" '(lambda ()
-	       (interactive)
-	       (load-file "~/.emacs.d/init.el"))
-
-    "f t" 'neotree-toggle
-    "f s" 'helm-do-ag-this-file
-
-    ;; org
-    "j j" 'org-capture
-
-
-
-
-
-    ;; projectile
-    "p t" 'neotree-toggle
-    "p p" 'helm-projectile-switch-project
-    "p f f" 'helm-projectile-find-file
-    "p f d" 'helm-projectile-find-dir
-    "p s" 'helm-projectile-ag
-    "p b" 'helm-projectile-switch-buffer
-    "p r" 'helm-projectile-recentf
-
-    ;; buffer
-    "b b" 'helm-buffers-list
-    "b d" 'kill-this-buffer
-    "b r" 'helm-recentf
-
-    ;; window
-    "w d" 'delete-window
-    "w v" 'evil-window-split
-    "w h" 'evil-window-vsplit
-    "w i" 'delete-other-windows
-
-    ;; evilnc
-    "ci" 'evilnc-comment-or-uncomment-lines
-    "cl" 'evilnc-quick-comment-or-uncomment-to-the-line
-    "ll" 'evilnc-quick-comment-or-uncomment-to-the-line
-    "cc" 'evilnc-copy-and-comment-lines
-    "cp" 'evilnc-comment-or-uncomment-paragraphs
-    "cr" 'comment-or-uncomment-region
-    "cv" 'evilnc-toggle-invert-comment-line-by-line
-    "."  'evilnc-copy-and-comment-operator
-    "\\" 'evilnc-comment-operator ; if you prefer backslash key
-
-
-    "r r" '(load-file '(read-file-name /Users/grass/.emacs.d/init.el))
-    "r f" 'format-all-buffer
-
-    "m a" 'package-install
-
-    "l f" 'load-file
-
-    "q q" 'save-buffers-kill-emacs
-
-    "t" 'org-todo
-    )
-  )
-
+;; 自动补全
 (use-package company
   :config
   (global-company-mode 1)
   )
 
+;; 为窗口绑定序号
 (use-package winum
   :config
   (defun winum-assign-0-to-neotree ()
@@ -191,61 +193,36 @@
    )
   )
 
+;; Org模式相关的，和GTD相关的
 (use-package org
   :init
   (setq org-directory "~/org/")
   (setq org-agenda-files (list "~/org/"))
-
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Inbox")
+           "* TODO %?\n  %i\n  %a")
+          ("j" "Journal" entry (file+datetree "~/org/journal.org")
+           "* %?\nEntered on %U\n  %i\n  %a")))
+  (setq org-todo-keywords
+        '(
+          (sequence "TODO(t!)" "SCHEDULED(s!)" "FUTURE(f!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)")
+          ))
 
   :bind
   (:map global-leader-map
-	("a" . org-agenda))
+	("oa" . org-agenda)
+	("ot" . org-todo-list)
+	("oc" . org-capture)
+	)
   )
 
-(use-package projectile
-  :init
-  (setq projectile-project-search-path '("~/mugeda/" "~/workspace/"))
-  :config
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (projectile-mode 1))
-
-(use-package neotree
-  :config
-  (evil-define-key 'normal neotree-mode-map (kbd "TAB") 'neotree-enter)
-  (evil-define-key 'normal neotree-mode-map (kbd "q") 'neotree-hide)
-  (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
-  (evil-define-key 'normal neotree-mode-map (kbd "g") 'neotree-refresh)
-  (evil-define-key 'normal neotree-mode-map (kbd "n") 'neotree-next-line)
-  (evil-define-key 'normal neotree-mode-map (kbd "p") 'neotree-previous-line)
-  (evil-define-key 'normal neotree-mode-map (kbd "A") 'neotree-stretch-toggle)
-  (evil-define-key 'normal neotree-mode-map (kbd "H") 'neotree-hidden-file-toggle)
-
-
-  (setq neo-smart-open t)
-  (setq projectile-switch-project-action 'neotree-projectile-action)
-  (defun neotree-project-dir ()
-    "Open NeoTree using the git root."
-    (interactive)
-    (let ((project-dir (projectile-project-root))
-          (file-name (buffer-file-name)))
-      (neotree-toggle)
-      (if project-dir
-          (if (neo-global--window-exists-p)
-	      (progn
-                (neotree-dir project-dir)
-                (neotree-find file-name)))
-        (message "Could not find git project root."))))
-
-  )
-
+;; 最近打开的文件
 (use-package recentf
-:init
-(setq recentf-save-file "~/.emacs.d/.cache/recentf")
-  :config
+  :init
+  (setq recentf-save-file "~/.emacs.d/.local/recentf")
   (setq recentf-max-saved-items 200
         recentf-max-menu-items 15)
+  :config
   (recentf-mode)
   )
 
@@ -257,71 +234,22 @@
   (set-face-background 'linum nil)
   )
 
+;; wakatime
 (use-package wakatime-mode
   :config
   (global-wakatime-mode))
 
+;; 记录命令使用次数
 (use-package keyfreq
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+;; 配置editorconfig
 (use-package editorconfig
   :ensure t
   :config
   (editorconfig-mode 1))
-
-(use-package evil-nerd-commenter)
-
-(use-package format-all
-  :config
-  (format-all-mode))
-
-(use-package rainbow-delimiters
-  :config
-  (rainbow-delimiters-mode)
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
-
-  )
-
-
-
-(use-package web-mode
-  :init
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-
-  )
-
-(use-package js2-mode)
-
-(use-package helm
-  :config
-  (helm-mode))
-
-
-
-(use-package helm-ag
-  :init
-  (add-to-list 'exec-path "/usr/local/bin")
-  )
-
-(use-package helm-projectile
-  :config
-  (helm-projectile-on)
-  )
-(use-package helm-themes)
-
-(use-package org-bullets
-  :ensure t
-  :hook (org-mode . org-bullets-mode))
 
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
@@ -333,23 +261,23 @@
   (load-file "~/.emacs.d/init.el"))
 
 
-(define-key global-leader-map "d" '("files"))
-(define-key global-leader-map "df" '("files"))
+(define-key global-leader-map "f" '("files"))
+(define-key global-leader-map "fe" '("emacs file"))
 (define-key global-leader-map "fei" '("打开Emacs配置文件" . gremacs/open-emacs-init))
-(define-key global-leader-map "fer" 'gremacs/load-emacs-init)
+(define-key global-leader-map "fer" '("重新加载Emacs配置文件" . gremacs/load-emacs-init))
+
+(define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
 
 
 (provide 'init)
 ;; init.el ends here
-
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(evil-collection tldr wakatime-modo org-bullets helm-themes helm-projectile helm-ag helm js2-mode web-mode magit amx rainbow-delimiters format-all evil-nerd-commenter editorconfig keyfreq wakatime-mode neotree projectile which-key winum company general evil use-package)))
+   '(editorconfig keyfreq wakatime-mode winum company which-key magit amx evil use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
