@@ -169,6 +169,25 @@
   :config
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t))
+
+;; 窗口切换
+(use-package window
+  :ensure nil
+  :bind
+  (:map global-leader-map
+	("wd" . delete-window)
+	("wo" . delete-other-windows)
+	)
+  )
+
+(use-package recentf
+  :ensure nil
+  :init
+  (setq recentf-max-saved-items 200
+        recentf-max-menu-items 15)
+  :hook (after-init . recentf-mode)
+  )
+
 )
 
 ;; 设置主题
@@ -254,6 +273,9 @@
 
 ;; ivy智能提示后端
 (use-package ivy
+  :init
+  ;; 可以使switch-buffer集成recentf
+  (setq ivy-use-virtual-buffers t)
   :hook (after-init . ivy-mode)
   :bind
   (:map global-leader-map
@@ -281,16 +303,6 @@
 (use-package company
   :config
   (global-company-mode 1)
-  )
-
-;; 窗口切换
-(use-package window
-  :ensure nil
-  :bind
-  (:map global-leader-map
-	("wd" . delete-window)
-	("wo" . delete-other-windows)
-	)
   )
 
 ;; 为窗口绑定序号
