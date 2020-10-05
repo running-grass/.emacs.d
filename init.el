@@ -171,7 +171,25 @@
   (load-theme 'zenburn t)
   )
 
+;; 安装icon管理
+(use-package all-the-icons)
 
+;; 自动保存
+(use-package super-save
+  :ensure t
+  :config
+  (super-save-mode +1))
+
+;; 番茄钟
+(use-package org-pomodoro
+  :bind
+  (:map global-leader-map
+	("ocp" . org-pomodoro))
+  )
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode))
 ;; 设置evil
 (use-package evil
   :ensure t
@@ -266,7 +284,9 @@
   (:map global-leader-map
 	("oa" . org-agenda)
 	("ot" . org-todo-list)
-	("oc" . org-capture)
+	("oj" . org-capture)
+	("oci" . org-clock-in)
+	("oco" . org-clock-out)
 	)
   )
 
@@ -338,7 +358,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(zenburn-theme persistent-overlays ivy editorconfig keyfreq wakatime-mode winum company which-key amx evil use-package)))
+   '(org-superstar org-pomodoro all-the-icons zenburn-theme persistent-overlays ivy editorconfig keyfreq wakatime-mode winum company which-key amx evil use-package))
+ '(wakatime-cli-path
+   "/usr/local/Cellar/wakatime-cli/13.0.7/libexec/bin/wakatime")
+ '(wakatime-python-bin nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
