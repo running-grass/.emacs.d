@@ -61,23 +61,26 @@
 (use-package hideshow
   :ensure nil
   :diminish hs-minor-mode
+  :hook (prog-mode . hs-minor-mode)
   :bind (:map global-leader-map
          ("TAB" . hs-toggle-hiding)
          ("S-TAB" . hs-show-all))
-  :hook (prog-mode . hs-minor-mode)
-  :custom
-  (hs-special-modes-alist
-   (mapcar 'purecopy
-           '((c-mode "{" "}" "/[*/]" nil nil)
-             (c++-mode "{" "}" "/[*/]" nil nil)
-             (rust-mode "{" "}" "/[*/]" nil nil)))))
+  )
 
 ;; 保存折叠状态
 (use-package persistent-overlays
-  :config
+  :init
   (setq persistent-overlays-directory "~/.emacs.d/.cache")
   :hook (hs-minor-mode . persistent-overlays-minor-mode)
   )
+
+;; 简单文件指示
+(use-package simple
+  :ensure nil
+  :hook (after-init . (lambda ()
+                         (line-number-mode)
+                         (column-number-mode)
+                         (size-indication-mode))))
 
 ;; 显示空白字符
 (use-package whitespace
@@ -146,6 +149,20 @@
         (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
   :custom
   (comment-auto-fill-only-comments t))
+
+
+;; 选中后直接输入，不用删除
+(use-package delsel
+  :ensure nil
+  :hook (after-init . delete-selection-mode))
+
+;; 高亮显示配对的大括号
+(use-package paren
+  :ensure nil
+  :hook (after-init . show-paren-mode)
+  :config
+  (setq show-paren-when-point-inside-paren t
+        show-paren-when-point-in-periphery t))
 )
 
 ;; 设置evil
