@@ -280,6 +280,15 @@
 	("jl" . avy-goto-line)
 	))
 
+;; 括号的多色彩
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+
+;; 搜索统计
+(use-package anzu
+  :hook (after-init . global-anzu-mode))
+
 ;; ivy智能提示后端
 (use-package ivy
   :init
@@ -442,7 +451,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(window zenburn-theme winum which-key wakatime-mode use-package super-save persistent-overlays org-superstar org-pomodoro keyfreq ivy evil-collection editorconfig company amx all-the-icons ace-window))
+   '(anzu rainbow-delimiters window zenburn-theme winum which-key wakatime-mode use-package super-save persistent-overlays org-superstar org-pomodoro keyfreq ivy evil-collection editorconfig company amx all-the-icons ace-window))
  '(wakatime-cli-path
    "/usr/local/Cellar/wakatime-cli/13.0.7/libexec/bin/wakatime")
  '(wakatime-python-bin nil))
