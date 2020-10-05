@@ -165,6 +165,13 @@
         show-paren-when-point-in-periphery t))
 )
 
+;; 设置主题
+(use-package zenburn-theme
+  :config
+  (load-theme 'zenburn t)
+  )
+
+
 ;; 设置evil
 (use-package evil
   :ensure t
@@ -331,7 +338,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(persistent-overlays ivy editorconfig keyfreq wakatime-mode winum company which-key amx evil use-package)))
+   '(zenburn-theme persistent-overlays ivy editorconfig keyfreq wakatime-mode winum company which-key amx evil use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
