@@ -67,8 +67,8 @@
   :ensure nil
   :hook (prog-mode . hs-minor-mode)
   :bind (
-	 :map evil-normal-state-map
-	 ;; :map global-leader-map
+	 ;; :map evil-normal-state-map
+	 :map global-leader-map
          ("TAB" . hs-toggle-hiding)
         )
   )
@@ -124,8 +124,8 @@
      lines-tail	; lines go beyond `fill-column'
      space-before-tab	; spaces before tab
      trailing           ; trailing blanks
-     tabs		; tabs (show by face)
-     tab-mark		; tabs (show by symbol)
+     ;; tabs		; tabs (show by face)
+     ;; tab-mark		; tabs (show by symbol)
      ))
   )
 
@@ -187,7 +187,6 @@
         recentf-max-menu-items 15)
   :hook (after-init . recentf-mode)
   )
-
 )
 
 ;; 设置主题
@@ -240,6 +239,12 @@
   (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
   (define-key evil-visual-state-map (kbd "SPC") global-leader-map)
   (define-key evil-emacs-state-map  (kbd "SPC") global-leader-map)
+
+  ;; 把，作为本地模式的保留按键
+  (define-key evil-normal-state-map (kbd ",") nil)
+  (define-key evil-motion-state-map (kbd ",") nil)
+  (define-key evil-visual-state-map (kbd ",") nil)
+  (define-key evil-emacs-state-map  (kbd ",") nil)
   )
   :bind
   (:map evil-move-state-map
@@ -377,9 +382,11 @@
   (:map global-leader-map
 	("oa" . org-agenda)
 	("ot" . org-todo-list)
-	("oj" . org-capture)
+	("oo" . org-capture)
 	("oci" . org-clock-in)
 	("oco" . org-clock-out)
+	:map org-mode-map
+	(",," . org-todo)
 	)
   )
 
@@ -438,7 +445,8 @@
 (define-key global-leader-map "hdp" 'describe-package)
 (define-key global-leader-map "hdf" 'describe-function)
 (define-key global-leader-map "hdv" 'describe-variable)
-(define-key global-leader-map "hdk" 'describe-keymap)
+(define-key global-leader-map "hdk" 'describe-key)
+(define-key global-leader-map "hdK" 'describe-keymap)
 
 (define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
 )
