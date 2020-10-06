@@ -27,6 +27,8 @@
 (setq use-package-always-ensure t)
 ;; 默认查找目录为home目录
 (setq command-line-default-directory "~")
+
+(setq bookmark-default-file "~/.emacs.d/.cache/bookmarks")
 ;; 定义全局的leader-map
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
@@ -369,13 +371,13 @@
   (setq org-directory "~/org/")
   (setq org-agenda-files (list "~/org/"))
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Inbox")
+        '(("t" "Todo" entry (file+headline "~/org/gtd.org" "收集箱")
            "* TODO %?\n  %i\n  %a")
-          ("j" "Journal" entry (file+datetree "~/org/journal.org")
+          ("j" "日记" entry (file+datetree "~/org/gtd.org" "日记")
            "* %?\nEntered on %U\n  %i\n  %a")))
   (setq org-todo-keywords
         '(
-          (sequence "TODO(t!)" "SCHEDULED(s!)" "FUTURE(f!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)")
+          (sequence "TODO(t!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)")
           ))
 
   :bind
@@ -387,6 +389,7 @@
 	("oco" . org-clock-out)
 	:map org-mode-map
 	(",," . org-todo)
+	(",r" . org-refile)
 	)
   )
 
@@ -437,6 +440,7 @@
 ;; 通用的快捷键绑定
 (progn
 (define-key global-leader-map "f" '("files"))
+(define-key global-leader-map "ff" 'find-file)
 (define-key global-leader-map "fe" '("emacs file"))
 (define-key global-leader-map "fei" '("打开Emacs配置文件" . gremacs/open-emacs-init))
 (define-key global-leader-map "fer" '("重新加载Emacs配置文件" . gremacs/load-emacs-init))
