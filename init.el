@@ -3,29 +3,31 @@
 
 ;;; Code:
 
+;; 初始化straight
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;; 使用straight安装use-package
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
 ;; use-package初始化
-(progn
-;; 引入package，以便使用package功能
-(require 'package)
-;; 设置清华镜像仓库
-(setq package-archives '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
-;; 自动把包下载安装到.cache中
-(setq package-user-dir "~/.emacs.d/.cache/elpa")
-(package-initialize)
-;; 自动安装use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
 (setq use-package-compute-statistics t)
-)
 
 ;; 初始化一些全局变量
 (progn
 ;;关闭启动画面
 (setq inhibit-startup-message t)
-;; 自动安装所有的包
-(setq use-package-always-ensure t)
 
 ;; 默认查找目录为home目录
 (setq command-line-default-directory "~")
@@ -41,7 +43,7 @@
 (progn
 ;; 窗口的撤销/恢复功能
 (use-package winner-mode
-  :ensure nil
+  :straight nil
   :hook (after-init . winner-mode)
   :bind
   (:map global-leader-map
@@ -51,25 +53,26 @@
 
 ;; 保存了上一次打开文件时的光标位置
 (use-package saveplace
-  :ensure nil
+  :straight nil
   :init
   (setq save-place-file "~/.emacs.d/.local/places")
   :hook (after-init . save-place-mode))
 
 ;; buffer相关的设置
 (use-package ibuffer
+  :straight nil
   :bind
   (:map global-leader-map
 	("bg" . ibuffer)))
 
 ;; 高亮当前行
 (use-package hl-line
-  :ensure nil
+  :straight nil
   :hook (after-init . global-hl-line-mode))
 
 ;; 显示/隐藏结构化的数据
 (use-package hideshow
-  :ensure nil
+  :straight nil
   :hook (prog-mode . hs-minor-mode)
   :bind (
 	 ;; :map evil-normal-state-map
@@ -79,15 +82,15 @@
   )
 
 ;; 保存折叠状态
-(use-package persistent-overlays
-  :init
-  (setq persistent-overlays-directory "~/.emacs.d/.cache")
-  :hook (hs-minor-mode . persistent-overlays-minor-mode)
-  )
+;; (use-package persistent-overlays
+;;   :init
+;;   (setq persistent-overlays-directory "~/.emacs.d/.cache")
+;;   :hook (hs-minor-mode . persistent-overlays-minor-mode)
+;;   )
 
 ;; 简单文件指示
 (use-package simple
-  :ensure nil
+  :straight nil
   :hook (after-init . (lambda ()
                          (line-number-mode)
                          (column-number-mode)
@@ -95,7 +98,7 @@
 
 ;; 显示空白字符
 (use-package whitespace
-  :ensure nil
+  :straight nil
   :hook (after-init . global-whitespace-mode)
 
   :config
@@ -136,17 +139,17 @@
 
 ;; 当某个文件的某一行特别长的时候，自动优化性能
 (use-package so-long
-  :ensure nil
+  :straight nil
   :config (global-so-long-mode 1))
 
 ;; 文件被外部程序修改后，重新载入buffer
 (use-package autorevert
-  :ensure nil
+  :straight nil
   :hook (after-init . global-auto-revert-mode))
 
 ;; 注释/反注释
 (use-package newcomment
-  :ensure nil
+  :straight nil
   :bind (:map global-leader-map ( "cl" . comment-or-uncomment))
   :config
   (defun comment-or-uncomment ()
@@ -164,12 +167,12 @@
 
 ;; 选中后直接输入，不用删除
 (use-package delsel
-  :ensure nil
+  :straight nil
   :hook (after-init . delete-selection-mode))
 
 ;; 高亮显示配对的大括号
 (use-package paren
-  :ensure nil
+  :straight nil
   :hook (after-init . show-paren-mode)
   :config
   (setq show-paren-when-point-inside-paren t
@@ -177,7 +180,7 @@
 
 ;; 窗口切换
 (use-package window
-  :ensure nil
+  :straight nil
   :bind
   (:map global-leader-map
 	("wd" . delete-window)
@@ -186,7 +189,7 @@
   )
 
 (use-package recentf
-  :ensure nil
+  :straight nil
   :init
   (setq recentf-max-saved-items 200
         recentf-max-menu-items 15)
@@ -196,7 +199,6 @@
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
-  :ensure t
   :config
   (exec-path-from-shell-initialize))
 
@@ -204,7 +206,6 @@
   :ensure t)
 
 (use-package org-web-tools)
-
 
 ;; 设置主题
 (use-package zenburn-theme
@@ -218,7 +219,6 @@
 
 ;; 自动保存
 (use-package super-save
-  :ensure t
   :config
   (super-save-mode +1))
 
@@ -236,7 +236,6 @@
 
 ;; 设置evil
 (use-package evil
-  :ensure t
   :init
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
@@ -286,7 +285,6 @@
 ;; 为常用包配置evil按键
 (use-package evil-collection
   :after evil
-  :ensure t
   :config
   (evil-collection-init))
 
@@ -451,7 +449,6 @@
 
 ;; 配置editorconfig
 (use-package editorconfig
-  :ensure t
   :config
   (editorconfig-mode 1))
 
@@ -483,19 +480,3 @@
 
 (provide 'init)
 ;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(exec-path-from-shell pocket-reader anzu rainbow-delimiters window zenburn-theme winum which-key wakatime-mode use-package super-save persistent-overlays org-superstar org-pomodoro keyfreq ivy evil-collection editorconfig company amx all-the-icons ace-window))
- '(wakatime-cli-path
-   "/usr/local/Cellar/wakatime-cli/13.0.7/libexec/bin/wakatime")
- '(wakatime-python-bin nil))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
