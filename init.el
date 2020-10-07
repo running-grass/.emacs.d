@@ -17,6 +17,7 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+(setq use-package-compute-statistics t)
 )
 
 ;; 初始化一些全局变量
@@ -25,6 +26,7 @@
 (setq inhibit-startup-message t)
 ;; 自动安装所有的包
 (setq use-package-always-ensure t)
+
 ;; 默认查找目录为home目录
 (setq command-line-default-directory "~")
 
@@ -33,6 +35,7 @@
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
 )
+
 
 ;; 内置模块的一些功能
 (progn
@@ -191,6 +194,18 @@
   )
 )
 
+(use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
+
+(use-package use-package-ensure-system-package
+  :ensure t)
+
+(use-package org-web-tools)
+
+
 ;; 设置主题
 (use-package zenburn-theme
   :config
@@ -235,18 +250,25 @@
                "Enabling test state."
              "Disabling test state.")))
 
-  (evil-set-initial-state 'org-agenda-mode 'move)
+  (evil-set-initial-state 'org-agenda-mode 'normal)
 
   (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
   (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
   (define-key evil-visual-state-map (kbd "SPC") global-leader-map)
   (define-key evil-emacs-state-map  (kbd "SPC") global-leader-map)
 
+  (define-key evil-normal-state-map (kbd "RET") nil)
+  (define-key evil-motion-state-map (kbd "RET") nil)
+  (define-key evil-visual-state-map (kbd "RET") nil)
+  (define-key evil-emacs-state-map  (kbd "RET") nil)
+
   ;; 把，作为本地模式的保留按键
   (define-key evil-normal-state-map (kbd ",") nil)
   (define-key evil-motion-state-map (kbd ",") nil)
   (define-key evil-visual-state-map (kbd ",") nil)
   (define-key evil-emacs-state-map  (kbd ",") nil)
+
+  (define-key evil-insert-state-map (kbd ",") 'self-insert-command)
   )
   :bind
   (:map evil-move-state-map
@@ -422,6 +444,11 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+(use-package pocket-reader
+  :bind
+  (:map global-leader-map
+	("lp" . pocket-reader)))
+
 ;; 配置editorconfig
 (use-package editorconfig
   :ensure t
@@ -445,12 +472,11 @@
 (define-key global-leader-map "fei" '("打开Emacs配置文件" . gremacs/open-emacs-init))
 (define-key global-leader-map "fer" '("重新加载Emacs配置文件" . gremacs/load-emacs-init))
 (define-key global-leader-map "h" '("help"))
-(define-key global-leader-map "hd" '("describe"))
-(define-key global-leader-map "hdp" 'describe-package)
-(define-key global-leader-map "hdf" 'describe-function)
-(define-key global-leader-map "hdv" 'describe-variable)
-(define-key global-leader-map "hdk" 'describe-key)
-(define-key global-leader-map "hdK" 'describe-keymap)
+(define-key global-leader-map "hp" 'describe-package)
+(define-key global-leader-map "hf" 'describe-function)
+(define-key global-leader-map "hv" 'describe-variable)
+(define-key global-leader-map "hk" 'describe-key)
+(define-key global-leader-map "hK" 'describe-keymap)
 
 (define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
 )
@@ -463,7 +489,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(anzu rainbow-delimiters window zenburn-theme winum which-key wakatime-mode use-package super-save persistent-overlays org-superstar org-pomodoro keyfreq ivy evil-collection editorconfig company amx all-the-icons ace-window))
+   '(exec-path-from-shell pocket-reader anzu rainbow-delimiters window zenburn-theme winum which-key wakatime-mode use-package super-save persistent-overlays org-superstar org-pomodoro keyfreq ivy evil-collection editorconfig company amx all-the-icons ace-window))
  '(wakatime-cli-path
    "/usr/local/Cellar/wakatime-cli/13.0.7/libexec/bin/wakatime")
  '(wakatime-python-bin nil))
