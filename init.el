@@ -205,6 +205,9 @@
 (use-package use-package-ensure-system-package
   :ensure t)
 
+(use-package ag
+  :ensure-system-package ag)
+
 (use-package org-web-tools)
 
 ;; 设置主题
@@ -229,6 +232,31 @@
 	("ocp" . org-pomodoro))
   )
 
+(use-package counsel-projectile
+  :config
+  (setq
+   projectile-known-projects-file "~/.emacs.d/.cache/projectile-bookmarks.eld"
+   projectile-project-search-path '("~/mugeda/" "~/workspace/")
+   )
+  (projectile-discover-projects-in-search-path)
+  :bind
+  (:map global-leader-map
+	("pf" . counsel-projectile-find-file )
+	("pP" . counsel-projectile-switch-open-project)
+	("pp" . counsel-projectile-switch-project)
+	("pb" . counsel-projectile-switch-to-buffer)
+	("ps" . counsel-projectile-ag)
+	))
+
+(use-package treemacs-projectile
+  :bind
+  (:map global-leader-map
+	("pt" . treemacs-projectile)
+	("0" . treemacs-select-window)
+	)
+  )
+
+
 ;; org标题美化
 (use-package org-superstar
   :after org
@@ -237,8 +265,8 @@
 ;; 设置evil
 (use-package evil
   :init
-  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   :hook (after-init . evil-mode)
   :config
   (progn
@@ -249,7 +277,7 @@
                "Enabling test state."
              "Disabling test state.")))
 
-  (evil-set-initial-state 'org-agenda-mode 'normal)
+  ;; (evil-set-initial-state 'org-agenda-mode 'normal)
 
   (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
   (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
@@ -287,6 +315,8 @@
   :after evil
   :config
   (evil-collection-init))
+
+(use-package treemacs-evil)
 
 ;; 设置amx，命令快速查找
 (use-package amx
@@ -354,14 +384,13 @@
 (use-package winum
   :config
   (defun winum-assign-0-to-neotree ()
-    (when (string-match-p (buffer-name) ".*\\*NeoTree\\*.*") 0))
+    (when (string-match-p (buffer-name) ".*Treemacs.*") 0))
   (add-to-list 'winum-assign-functions 'winum-assign-0-to-neotree)
   (winum-mode)
   :bind
   (
    :map global-leader-map
    ;; 选择窗口
-   ("0" . winum-select-window-0)
    ("1" . winum-select-window-1)
    ("2" . winum-select-window-2)
    ("3" . winum-select-window-3)
@@ -451,6 +480,10 @@
 (use-package editorconfig
   :config
   (editorconfig-mode 1))
+
+(use-package vue-mode
+  :mode "\\.vue\\'"
+  )
 
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
