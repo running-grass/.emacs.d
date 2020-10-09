@@ -26,9 +26,9 @@
 
 ;; 初始化一些全局变量
 (progn
+(toggle-frame-fullscreen)
 ;;关闭启动画面
 (setq inhibit-startup-message t)
-
 ;; 默认查找目录为home目录
 (setq command-line-default-directory "~")
 
@@ -36,6 +36,9 @@
 ;; 定义全局的leader-map
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
+
+(set-frame-font "Source Code Pro 18" nil t)
+
 )
 
 
