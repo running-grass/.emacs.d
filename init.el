@@ -6,7 +6,7 @@
 ;; 初始化straight
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	(expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
@@ -24,9 +24,12 @@
 ;; use-package初始化
 (setq use-package-compute-statistics t)
 
+;; 启动时全屏
+(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
+  (toggle-frame-fullscreen))
+
 ;; 初始化一些全局变量
 (progn
-(toggle-frame-fullscreen)
 ;;关闭启动画面
 (setq inhibit-startup-message t)
 ;; 默认查找目录为home目录
@@ -78,7 +81,6 @@
   :straight nil
   :hook (prog-mode . hs-minor-mode)
   :bind (
-	 ;; :map evil-normal-state-map
 	 :map global-leader-map
          ("TAB" . hs-toggle-hiding)
         )
@@ -191,13 +193,16 @@
 	)
   )
 
+;; 最近打开的文件
 (use-package recentf
   :straight nil
   :init
-  (setq recentf-max-saved-items 200
-        recentf-max-menu-items 15)
+  (setq
+   recentf-save-file "~/.emacs.d/.local/recentf"
+   recentf-max-saved-items 200
+   recentf-max-menu-items 15)
   :hook (after-init . recentf-mode)
-  )
+)
 )
 
 (use-package exec-path-from-shell
@@ -205,35 +210,37 @@
   :config
   (exec-path-from-shell-initialize))
 
-(use-package use-package-ensure-system-package
-  :ensure t)
+(use-package use-package-ensure-system-package)
 
-(use-package ag
-  :ensure-system-package ag)
-
-(use-package org-web-tools)
+(use-package ag :ensure-system-package ag)
 
 ;; 设置主题
-(use-package zenburn-theme
+(use-package doom-themes
   :config
-  (load-theme 'zenburn t)
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+  (doom-themes-treemacs-config)
+
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config)
   )
 
-
 ;; 安装icon管理
-(use-package all-the-icons)
+(use-package all-the-icons
+  )
 
 ;; 自动保存
 (use-package super-save
   :config
   (super-save-mode +1))
-
-;; 番茄钟
-(use-package org-pomodoro
-  :bind
-  (:map global-leader-map
-	("ocp" . org-pomodoro))
-  )
 
 (use-package counsel-projectile
   :config
@@ -259,12 +266,6 @@
 	)
   )
 
-
-;; org标题美化
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode))
-
 ;; 设置evil
 (use-package evil
   :init
@@ -273,14 +274,6 @@
   :hook (after-init . evil-mode)
   :config
   (progn
-  (evil-define-state move
-  "Test state."
-  :tag "<m>"
-  (message (if (evil-move-state-p)
-               "Enabling test state."
-             "Disabling test state.")))
-
-  ;; (evil-set-initial-state 'org-agenda-mode 'normal)
 
   (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
   (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
@@ -301,13 +294,7 @@
   (define-key evil-insert-state-map (kbd ",") 'self-insert-command)
   )
   :bind
-  (:map evil-move-state-map
-	("j" . evil-next-line)
-	("k" . evil-previous-line)
-	("h" . evil-backward-char)
-	("l" . evil-forwark-char)
-
-	:map global-leader-map
+  (:map global-leader-map
 	("wv" . evil-window-vsplit)
 	("wh" . evil-window-split)
   )
@@ -319,7 +306,8 @@
   :config
   (evil-collection-init))
 
-(use-package treemacs-evil)
+(use-package treemacs-evil
+  :after treemacs)
 
 ;; 设置amx，命令快速查找
 (use-package amx
@@ -342,16 +330,19 @@
 
 ;; 括号的多色彩
 (use-package rainbow-delimiters
+  :defer 5
   :hook (prog-mode . rainbow-delimiters-mode)
   )
 
 ;; 搜索统计
 (use-package anzu
+  :defer 5
   :hook (after-init . global-anzu-mode))
 
 ;; ivy智能提示后端
 (use-package ivy
-  :init
+  :defer 5
+  :config
   ;; 可以使switch-buffer集成recentf
   (setq ivy-use-virtual-buffers t)
   :hook (after-init . ivy-mode)
@@ -362,6 +353,7 @@
 
 ;; 快捷键提示
 (use-package which-key
+  :defer 5
   :init
   ;; 为define-key增加注释
   (setq which-key-enable-extended-define-key t)
@@ -379,6 +371,7 @@
 
 ;; 自动补全
 (use-package company
+  :defer 5
   :config
   (global-company-mode 1)
   )
@@ -409,6 +402,7 @@
 
 ;; 窗口切换
 (use-package ace-window
+  :defer 5
   :init
   (setq aw-dispatch-always nil)
   :bind
@@ -419,18 +413,24 @@
 
 ;; Org模式相关的，和GTD相关的
 (use-package org
-  :init
-  (setq org-directory "~/org/")
-  (setq org-agenda-files (list "~/org/"))
-  (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/org/gtd.org" "收集箱")
-           "* TODO %?\n  %i\n  %a")
-          ("j" "日记" entry (file+datetree "~/org/gtd.org" "日记")
-           "* %?\nEntered on %U\n  %i\n  %a")))
-  (setq org-todo-keywords
-        '(
-          (sequence "TODO(t!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)")
-          ))
+  :defer 3
+  :config
+  (setq
+   org-directory "~/org/"
+   org-agenda-files (list "~/org/")
+   org-capture-templates '(
+			   ("t" "Todo" entry
+			    (file+headline "~/org/gtd.org" "收集箱")
+			    "* TODO %?\n  %i\n  %a")
+			   ("j" "日记" entry
+			    (file+datetree "~/org/gtd.org" "日记")
+			    "* %?\nEntered on %U\n  %i\n  %a")
+			   )
+   org-todo-keywords '(
+		       (sequence "TODO(t!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)")
+		       )
+   org-clock-string-limit 1
+ )
 
   :bind
   (:map global-leader-map
@@ -442,19 +442,42 @@
 	:map org-mode-map
 	(",," . org-todo)
 	(",r" . org-refile)
+	(",tc" . org-toggle-checkbox)
 	)
   )
 
-;; 最近打开的文件
-(use-package recentf
-  :init
-  (setq recentf-save-file "~/.emacs.d/.local/recentf")
-  (setq recentf-max-saved-items 200
-        recentf-max-menu-items 15)
-  :config
-  (recentf-mode)
+;; 番茄钟
+(use-package org-pomodoro
+  :after org
+  :bind
+  (:map global-leader-map
+	("ocp" . org-pomodoro))
   )
 
+
+
+;; 绑定快捷键
+(use-package org-agenda
+  :straight nil
+  :after org
+  :bind
+  (:map org-agenda-mode-map
+	("," . nil)
+	(",s" . org-agenda-schedule)
+	(",p" . org-pomodoro)
+	))
+
+;; org标题美化
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode))
+
+
+;; 美化modeline
+(use-package doom-modeline
+  :init
+  (setq doom-modeline-modal-icon t)
+  (doom-modeline-mode 1))
 ;; 增加文件的行号
 (use-package linum
   :config
@@ -484,9 +507,16 @@
   :config
   (editorconfig-mode 1))
 
+;; 配置vue支持
 (use-package vue-mode
   :mode "\\.vue\\'"
   )
+
+;; 配置swiper
+(use-package swiper
+  :bind
+  (:map global-leader-map
+	("fs" . swiper-isearch)))
 
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
@@ -513,6 +543,8 @@
 
 (define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
 )
+
+
 
 (provide 'init)
 ;; init.el ends here
