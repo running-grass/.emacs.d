@@ -6,7 +6,7 @@
 ;; 初始化straight
 (defvar bootstrap-version)
 (let ((bootstrap-file
-	(expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
@@ -29,7 +29,6 @@
   (toggle-frame-fullscreen))
 
 ;; 初始化一些全局变量
-(progn
 ;;关闭启动画面
 (setq inhibit-startup-message t)
 ;; 默认查找目录为home目录
@@ -42,11 +41,8 @@
 
 (set-frame-font "Source Code Pro 18" nil t)
 
-)
-
-
 ;; 内置模块的一些功能
-(progn
+
 ;; 窗口的撤销/恢复功能
 (use-package winner-mode
   :straight nil
@@ -55,7 +51,7 @@
   (:map global-leader-map
 	("wz" . winner-undo)
 	("wZ" . winner-redo)
-))
+	))
 
 ;; 保存了上一次打开文件时的光标位置
 (use-package saveplace
@@ -83,7 +79,7 @@
   :bind (
 	 :map global-leader-map
          ("TAB" . hs-toggle-hiding)
-        )
+         )
   )
 
 ;; 保存折叠状态
@@ -97,9 +93,9 @@
 (use-package simple
   :straight nil
   :hook (after-init . (lambda ()
-                         (line-number-mode)
-                         (column-number-mode)
-                         (size-indication-mode))))
+                        (line-number-mode)
+                        (column-number-mode)
+                        (size-indication-mode))))
 
 ;; 显示空白字符
 (use-package whitespace
@@ -107,7 +103,7 @@
   :hook (after-init . global-whitespace-mode)
 
   :config
-    (face-spec-set 'whitespace-tab
+  (face-spec-set 'whitespace-tab
                  '((t :background unspecified)))
   ;; For some reason use face-defface-spec as spec-type doesn't work.  My guess
   ;; is it's due to the variables with the same name as the faces in
@@ -202,8 +198,7 @@
    recentf-max-saved-items 200
    recentf-max-menu-items 15)
   :hook (after-init . recentf-mode)
-)
-)
+  )
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
@@ -224,7 +219,7 @@
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-  
+
   ;; or for treemacs users
   (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
   (doom-themes-treemacs-config)
@@ -234,8 +229,7 @@
   )
 
 ;; 安装icon管理
-(use-package all-the-icons
-  )
+(use-package all-the-icons)
 
 ;; 自动保存
 (use-package super-save
@@ -271,33 +265,36 @@
   :init
   (setq evil-want-keybinding nil)
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-  :hook (after-init . evil-mode)
+  :hook (after-init . evil-mode )
   :config
   (progn
 
-  (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
-  (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
-  (define-key evil-visual-state-map (kbd "SPC") global-leader-map)
-  (define-key evil-emacs-state-map  (kbd "SPC") global-leader-map)
+    (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
+    (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
+    (define-key evil-emacs-state-map  (kbd "SPC") global-leader-map)
 
-  (define-key evil-normal-state-map (kbd "RET") nil)
-  (define-key evil-motion-state-map (kbd "RET") nil)
-  (define-key evil-visual-state-map (kbd "RET") nil)
-  (define-key evil-emacs-state-map  (kbd "RET") nil)
+    (define-key evil-normal-state-map (kbd "RET") nil)
+    (define-key evil-motion-state-map (kbd "RET") nil)
+    (define-key evil-emacs-state-map  (kbd "RET") nil)
 
-  ;; 把，作为本地模式的保留按键
-  (define-key evil-normal-state-map (kbd ",") nil)
-  (define-key evil-motion-state-map (kbd ",") nil)
-  (define-key evil-visual-state-map (kbd ",") nil)
-  (define-key evil-emacs-state-map  (kbd ",") nil)
+    ;; 把，作为本地模式的保留按键
+    (define-key evil-normal-state-map (kbd ",") nil)
+    (define-key evil-motion-state-map (kbd ",") nil)
+    (define-key evil-emacs-state-map  (kbd ",") nil)
 
-  (define-key evil-insert-state-map (kbd ",") 'self-insert-command)
-  )
+    (define-key evil-insert-state-map (kbd ",") 'self-insert-command)
+    )
   :bind
-  (:map global-leader-map
-	("wv" . evil-window-vsplit)
-	("wh" . evil-window-split)
-  )
+  (
+   :map global-leader-map
+   ("wv" . evil-window-vsplit)
+   ("wh" . evil-window-split)
+   :map evil-visual-state-map
+   ("RET" . nil)
+   ("," . nil)
+   ("SPC" . global-leader-map)
+   ("f" . indent-region)
+   )
   )
 
 ;; 为常用包配置evil按键
@@ -430,7 +427,7 @@
 		       (sequence "TODO(t!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)")
 		       )
    org-clock-string-limit 1
- )
+   )
 
   :bind
   (:map global-leader-map
@@ -478,6 +475,14 @@
   :init
   (setq doom-modeline-modal-icon t)
   (doom-modeline-mode 1))
+
+;; 快速选择工具
+(use-package expand-region
+  :after evil
+  :bind
+  (:map evil-visual-state-map
+	("v" . er/expand-region))
+  )
 ;; 增加文件的行号
 (use-package linum
   :config
@@ -528,7 +533,6 @@
   (load-file "~/.emacs.d/init.el"))
 
 ;; 通用的快捷键绑定
-(progn
 (define-key global-leader-map "f" '("files"))
 (define-key global-leader-map "ff" 'find-file)
 (define-key global-leader-map "fe" '("emacs file"))
@@ -542,7 +546,6 @@
 (define-key global-leader-map "hK" 'describe-keymap)
 
 (define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
-)
 
 
 
