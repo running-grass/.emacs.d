@@ -31,6 +31,11 @@
 ;; 初始化一些全局变量
 ;;关闭启动画面
 (setq inhibit-startup-message t)
+;; 设置2个空格
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
+(setq-default default-tab-width 2)
+
 ;; 默认查找目录为home目录
 (setq command-line-default-directory "~")
 
@@ -311,6 +316,7 @@
    :map global-leader-map
    ("wv" . evil-window-vsplit)
    ("wh" . evil-window-split)
+   ("bd" . evil-delete-buffer)
    :map evil-visual-state-map
    ("RET" . nil)
    ("," . nil)
@@ -429,6 +435,7 @@
    (",s" . org-schedule)
    (",d" . org-deadline)
    (",t" . org-toggle-checkbox)
+   (",p" . org-pomodoro)
    :map gtd-local-map
    ("a" . org-agenda)
    ("ci" . org-clock-in)
@@ -467,6 +474,7 @@
    (",," . org-agenda-todo)
    (",s" . org-agenda-schedule)
    (",d" . org-agenda-deadline)
+   (",p" . org-pomodoro)
    ))
 
 ;; org标题美化
@@ -522,6 +530,13 @@
 ;; 配置vue支持
 (use-package vue-mode
   :mode "\\.vue\\'"
+  )
+
+;; 配置emmet-mode
+;; 默认为C-j展开
+(use-package emmet-mode
+  :hook html-mode
+  :hook css-mode
   )
 
 ;; 配置swiper
