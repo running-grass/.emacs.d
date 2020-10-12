@@ -38,8 +38,10 @@
 ;; 定义全局的leader-map
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
+
 (defvar gtd-local-map (make-sparse-keymap)
   "自己和gtd相关的快捷键映射表")
+(define-key global-leader-map (kbd "o") gtd-local-map)
 
 (set-frame-font "Source Code Pro 18" nil t)
 
@@ -417,23 +419,22 @@
    org-clock-string-limit 1
    )
 
-  (define-key global-leader-map (kbd "o") gtd-local-map)
   (define-key org-mode-map (kbd ".") gtd-local-map)
 
   :bind
   (
    :map org-mode-map
-	(",," . org-todo)
-	(",s" . org-schedule)
-	(",d" . org-deadline)
-	(",t" . org-toggle-checkbox)
+   ("," . nil)
+   (",," . org-todo)
+   (",s" . org-schedule)
+   (",d" . org-deadline)
+   (",t" . org-toggle-checkbox)
    :map gtd-local-map
    ("a" . org-agenda)
    ("ci" . org-clock-in)
    ("co" . org-clock-out)
    ("io" . org-clock-report)
    ("r" . org-refile)
-   ("tc" . org-toggle-checkbox)
    ("o" . org-capture)
    )
   )
@@ -462,6 +463,8 @@
    ("s" . org-agenda-schedule)
    ("d" . org-agenda-deadline)
    :map org-agenda-mode-map
+   ("," . nil)
+   (",," . org-agenda-todo)
    (",s" . org-agenda-schedule)
    (",d" . org-agenda-deadline)
    ))
