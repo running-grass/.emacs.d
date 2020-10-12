@@ -38,8 +38,28 @@
 ;; 定义全局的leader-map
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
+(defvar gtd-local-map (make-sparse-keymap)
+  "自己和gtd相关的快捷键映射表")
 
 (set-frame-font "Source Code Pro 18" nil t)
+
+
+;; 快捷键提示
+(use-package which-key
+  :config
+  ;; 为define-key增加注释
+  (setq which-key-enable-extended-define-key t)
+  (setq which-key-show-early-on-C-h t)
+  (setq which-key-idle-delay 1)
+  (setq which-key-idle-secondary-delay 0.05)
+
+  ;; 替换快捷键提示符
+  (push '(("\\(.*\\) 0" . "winum-select-window-0") . ("\\1 0..9" . "window 0..9"))
+	which-key-replacement-alist)
+  ;; 忽略winum-select-window-[1-9]这9个提示
+  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist)
+  (which-key-mode)
+  )
 
 ;; 内置模块的一些功能
 
@@ -327,18 +347,15 @@
 
 ;; 括号的多色彩
 (use-package rainbow-delimiters
-  :defer 5
   :hook (prog-mode . rainbow-delimiters-mode)
   )
 
 ;; 搜索统计
 (use-package anzu
-  :defer 5
   :hook (after-init . global-anzu-mode))
 
 ;; ivy智能提示后端
 (use-package ivy
-  :defer 5
   :config
   ;; 可以使switch-buffer集成recentf
   (setq ivy-use-virtual-buffers t)
@@ -348,27 +365,8 @@
 	("bb" . ivy-switch-buffer)
 	))
 
-;; 快捷键提示
-(use-package which-key
-  :defer 5
-  :init
-  ;; 为define-key增加注释
-  (setq which-key-enable-extended-define-key t)
-  (setq which-key-show-early-on-C-h t)
-  (setq which-key-idle-delay 1)
-  (setq which-key-idle-secondary-delay 0.05)
-  :config
-  ;; 替换快捷键提示符
-  (push '(("\\(.*\\) 0" . "winum-select-window-0") . ("\\1 0..9" . "window 0..9"))
-	which-key-replacement-alist)
-  ;; 忽略winum-select-window-[1-9]这9个提示
-  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist)
-  (which-key-mode)
-  )
-
 ;; 自动补全
 (use-package company
-  :defer 5
   :config
   (global-company-mode 1)
   )
@@ -399,7 +397,6 @@
 
 ;; 窗口切换
 (use-package ace-window
-  :defer 5
   :init
   (setq aw-dispatch-always nil)
   :bind
@@ -410,45 +407,45 @@
 
 ;; Org模式相关的，和GTD相关的
 (use-package org
-  :defer 3
   :config
   (setq
    org-directory "~/org/"
    org-agenda-files (list "~/org/")
-   org-capture-templates '(
-			   ("t" "Todo" entry
-			    (file+headline "~/org/gtd.org" "收集箱")
-			    "* TODO %?\n  %i\n  %a")
-			   ("j" "日记" entry
-			    (file+datetree "~/org/gtd.org" "日记")
-			    "* %?\nEntered on %U\n  %i\n  %a")
-			   )
-   org-todo-keywords '(
-		       (sequence "TODO(t!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)")
-		       )
+   org-capture-templates '(("t" "Todo" entry (file+headline "~/org/gtd.org" "收集箱") "* TODO %?\n  %i\n  %a")
+			   ("j" "日记" entry (file+datetree "~/org/gtd.org" "日记") "* %?\nEntered on %U\n  %i\n  %a"))
+   org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)"))
    org-clock-string-limit 1
    )
 
+  (define-key global-leader-map (kbd "o") gtd-local-map)
+  (define-key org-mode-map (kbd ".") gtd-local-map)
+
   :bind
-  (:map global-leader-map
-	("oa" . org-agenda)
-	("ot" . org-todo-list)
-	("oo" . org-capture)
-	("oci" . org-clock-in)
-	("oco" . org-clock-out)
-	:map org-mode-map
+  (
+   :map org-mode-map
 	(",," . org-todo)
-	(",r" . org-refile)
-	(",tc" . org-toggle-checkbox)
-	)
+	(",s" . org-schedule)
+	(",d" . org-deadline)
+	(",t" . org-toggle-checkbox)
+   :map gtd-local-map
+   ("a" . org-agenda)
+   ("ci" . org-clock-in)
+   ("co" . org-clock-out)
+   ("io" . org-clock-report)
+   ("r" . org-refile)
+   ("tc" . org-toggle-checkbox)
+   ("o" . org-capture)
+   )
   )
 
 ;; 番茄钟
 (use-package org-pomodoro
   :after org
   :bind
-  (:map global-leader-map
-	("ocp" . org-pomodoro))
+  (
+   :map gtd-local-map
+   ("p" . org-pomodoro)
+   )
   )
 
 
@@ -457,12 +454,17 @@
 (use-package org-agenda
   :straight nil
   :after org
+  :config
+  (define-key org-agenda-mode-map (kbd ".") gtd-local-map)
   :bind
-  (:map org-agenda-mode-map
-	("," . nil)
-	(",s" . org-agenda-schedule)
-	(",p" . org-pomodoro)
-	))
+  (
+   :map gtd-local-map
+   ("s" . org-agenda-schedule)
+   ("d" . org-agenda-deadline)
+   :map org-agenda-mode-map
+   (",s" . org-agenda-schedule)
+   (",d" . org-agenda-deadline)
+   ))
 
 ;; org标题美化
 (use-package org-superstar
@@ -496,6 +498,8 @@
   :config
   (global-wakatime-mode))
 
+
+
 ;; 记录命令使用次数
 (use-package keyfreq
   :config
@@ -523,6 +527,30 @@
   (:map global-leader-map
 	("fs" . swiper-isearch)))
 
+(use-package helm
+  :defer t)
+(use-package org-redmine
+  :defer t
+  :config
+  (setq
+   org-redmine-limit 100 ; 列表请求条数
+   org-redmine-uri "http://redmine.mugeda.com" ; redmine域名
+   org-redmine-auth-api-key "63535623b7f690f8c12c8c94b1d827466196cb9a" ; redmine的Api
+   org-redmine-template-anything-source "#%i% (%d_date%) [%p_n%] %s% @%as_n%" ; issue列表展示模板
+   )
+  (defun org-redmine-show-mine-issue ()
+    ;; "展示分配给我的Issue"
+    (interactive)
+    ;; 可选参数 是否为只加载自己的issue
+    (org-redmine-helm-show-issue-all t))
+  :bind
+  (:map global-leader-map
+	("lr" . 'org-redmine-show-mine-issue)
+	("lR" . 'org-redmine-helm-show-issue-all)
+	("ir" . 'org-redmine-get-issue)
+	)
+  )
+
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
   (interactive)
@@ -533,12 +561,10 @@
   (load-file "~/.emacs.d/init.el"))
 
 ;; 通用的快捷键绑定
-(define-key global-leader-map "f" '("files"))
 (define-key global-leader-map "ff" 'find-file)
 (define-key global-leader-map "fe" '("emacs file"))
 (define-key global-leader-map "fei" '("打开Emacs配置文件" . gremacs/open-emacs-init))
 (define-key global-leader-map "fer" '("重新加载Emacs配置文件" . gremacs/load-emacs-init))
-(define-key global-leader-map "h" '("help"))
 (define-key global-leader-map "hp" 'describe-package)
 (define-key global-leader-map "hf" 'describe-function)
 (define-key global-leader-map "hv" 'describe-variable)
