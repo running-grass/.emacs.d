@@ -3,6 +3,15 @@
 
 ;;; Code:
 
+;; 关闭工具栏，tool-bar-mode 即为一个 Minor Mode
+(tool-bar-mode -1)
+
+;; 关闭文件滑动控件
+(scroll-bar-mode -1)
+
+;;关闭启动画面
+(setq inhibit-startup-message t)
+
 ;; 初始化straight
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -29,8 +38,6 @@
   (toggle-frame-fullscreen))
 
 ;; 初始化一些全局变量
-;;关闭启动画面
-(setq inhibit-startup-message t)
 ;; 设置2个空格
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 2)
@@ -48,7 +55,7 @@
   "自己和gtd相关的快捷键映射表")
 (define-key global-leader-map (kbd "o") gtd-local-map)
 
-(set-frame-font "Source Code Pro 18" nil t)
+(set-frame-font "Source Code Pro 16" nil t)
 
 
 ;; 快捷键提示
@@ -79,6 +86,12 @@
 	("wz" . winner-undo)
 	("wZ" . winner-redo)
 	))
+
+(use-package dired
+  :straight nil
+  :config
+  (define-key dired-mode-map (kbd "SPC") global-leader-map)
+  )
 
 ;; 保存了上一次打开文件时的光标位置
 (use-package saveplace
@@ -418,14 +431,21 @@
   :config
   (setq
    org-directory "~/org/"
-   org-agenda-files (list "~/org/")
-   org-capture-templates '(("t" "Todo" entry (file+headline "~/org/gtd.org" "收集箱") "* TODO %?\n  %i\n  %a")
-			   ("j" "日记" entry (file+datetree "~/org/gtd.org" "日记") "* %?\nEntered on %U\n  %i\n  %a"))
-   org-todo-keywords '((sequence "TODO(t!)" "WAIT(w@)" "|" "DONE(d!)" "CANCELED(c@)"))
+   ;; org-agenda-files (list "~/org/")
+   org-agenda-files '("~/org/inbox.org"
+                      "~/org/task.org"
+                      "~/org/project.org"
+                      "~/org/journal.org"
+                      "~/org/tickler.org")
+   org-capture-templates '(("t" "Todo" entry (file+headline "~/org/inbox.org" "Inbox") "* TODO %?\n  %i\n  %a")
+			   ("j" "日记" entry (file+datetree "~/org/journal.org" "Journal") "* %?\nEntered on %U\n  %i\n  %a"))
+   org-refile-targets '(("~/org/task.org" :level . 1)
+                        ("~/org/project.org" :maxlevel . 2)
+                        ("~/org/someday.org" :level . 1)
+                        ("~/org/tickler.org" :maxlevel . 1))
+   org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)"))
    org-clock-string-limit 1
    )
-
-  (define-key org-mode-map (kbd ".") gtd-local-map)
 
   :bind
   (
@@ -436,13 +456,16 @@
    (",d" . org-deadline)
    (",t" . org-toggle-checkbox)
    (",p" . org-pomodoro)
-   :map gtd-local-map
-   ("a" . org-agenda)
-   ("ci" . org-clock-in)
-   ("co" . org-clock-out)
-   ("io" . org-clock-report)
-   ("r" . org-refile)
-   ("o" . org-capture)
+   (",r" . org-refile)
+   (",a" . org-archive-subtree-default)
+   :map global-leader-map
+   ("oa" . org-agenda)
+   ("oci" . org-clock-in)
+   ("oco" . org-clock-out)
+   ("oio" . org-clock-report)
+   ("or" . org-refile)
+   ("oo" . org-capture)
+   ("ot" . org-todo-list)
    )
   )
 
@@ -473,8 +496,10 @@
    ("," . nil)
    (",," . org-agenda-todo)
    (",s" . org-agenda-schedule)
+   (",r" . org-agenda-refile)
    (",d" . org-agenda-deadline)
    (",p" . org-pomodoro)
+   (",a" . org-agenda-archive-default)
    ))
 
 ;; org标题美化
@@ -482,6 +507,30 @@
   :after org
   :hook (org-mode . org-superstar-mode))
 
+(use-package helm
+  :defer t)
+;; 支持redmine
+(use-package org-redmine
+  :config
+  (setq
+   org-redmine-limit 100 ; 列表请求条数
+   org-redmine-uri "http://redmine.mugeda.com" ; redmine域名
+   org-redmine-auth-api-key "63535623b7f690f8c12c8c94b1d827466196cb9a" ; redmine的Api
+   org-redmine-template-anything-source "#%i% (%d_date%) [%p_n%] %s% @%as_n%" ; issue列表展示模板
+   )
+  (defun org-redmine-show-mine-issue ()
+    ;; "展示分配给我的Issue"
+    (interactive)
+    ;; 可选参数 是否为只加载自己的issue
+    (org-redmine-helm-show-issue-all t))
+  :bind
+  (
+   :map global-leader-map
+	 ("lr" . 'org-redmine-show-mine-issue)
+	 ("lR" . 'org-redmine-helm-show-issue-all)
+   :map org-mode-map
+	 (",ir" . 'org-redmine-get-issue))
+  )
 
 ;; 美化modeline
 (use-package doom-modeline
@@ -545,29 +594,14 @@
   (:map global-leader-map
 	("fs" . swiper-isearch)))
 
-(use-package helm
-  :defer t)
-(use-package org-redmine
-  :defer t
-  :config
-  (setq
-   org-redmine-limit 100 ; 列表请求条数
-   org-redmine-uri "http://redmine.mugeda.com" ; redmine域名
-   org-redmine-auth-api-key "63535623b7f690f8c12c8c94b1d827466196cb9a" ; redmine的Api
-   org-redmine-template-anything-source "#%i% (%d_date%) [%p_n%] %s% @%as_n%" ; issue列表展示模板
-   )
-  (defun org-redmine-show-mine-issue ()
-    ;; "展示分配给我的Issue"
-    (interactive)
-    ;; 可选参数 是否为只加载自己的issue
-    (org-redmine-helm-show-issue-all t))
-  :bind
-  (:map global-leader-map
-	("lr" . 'org-redmine-show-mine-issue)
-	("lR" . 'org-redmine-helm-show-issue-all)
-	("ir" . 'org-redmine-get-issue)
-	)
+(use-package ggtags
+  :ensure-system-package global
   )
+
+(use-package tramp
+  :straight nil
+  :config
+  (setq tramp-persistency-file-name "~/.emacs.d/.cache/tramp"))
 
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
@@ -577,6 +611,7 @@
 (defun gremacs/load-emacs-init ()
   (interactive)
   (load-file "~/.emacs.d/init.el"))
+
 
 ;; 通用的快捷键绑定
 (define-key global-leader-map "ff" 'find-file)
