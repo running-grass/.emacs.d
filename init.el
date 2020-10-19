@@ -11,6 +11,8 @@
 
 ;;关闭启动画面
 (setq inhibit-startup-message t)
+(setq org-agenda-include-diary nil)
+
 
 ;; 初始化straight
 (defvar bootstrap-version)
@@ -280,7 +282,7 @@
   :config
   (setq
    projectile-known-projects-file "~/.emacs.d/.cache/projectile-bookmarks.eld"
-   projectile-project-search-path '("~/mugeda/" "~/workspace/")
+   projectile-project-search-path '("~/mugeda/" "~/workspace/" "~/org")
    )
   (projectile-discover-projects-in-search-path)
   :bind
@@ -293,12 +295,13 @@
 	))
 
 (use-package treemacs-projectile
+  :config
   :bind
-  (:map global-leader-map
-	("pt" . treemacs-projectile)
-	("0" . treemacs-select-window)
-	)
-  )
+  (
+   :map global-leader-map
+       ("pt" . treemacs-projectile)
+       ("0" . treemacs-select-window)
+	 ))
 
 ;; 设置evil
 (use-package evil
@@ -396,7 +399,7 @@
 (use-package winum
   :config
   (defun winum-assign-0-to-neotree ()
-    (when (string-match-p (buffer-name) ".*Treemacs.*") 0))
+    (when (string-match-p (buffer-name) ".*Neotree.*") 0))
   (add-to-list 'winum-assign-functions 'winum-assign-0-to-neotree)
   (winum-mode)
   :bind
@@ -442,9 +445,18 @@
    org-refile-targets '(("~/org/task.org" :level . 1)
                         ("~/org/project.org" :maxlevel . 2)
                         ("~/org/someday.org" :level . 1)
+                        ("~/org/love.org" :level . 1)
                         ("~/org/tickler.org" :maxlevel . 1))
    org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)"))
    org-clock-string-limit 1
+   org-log-refile nil
+   org-tag-alist '(
+                   (:startgroup . nil)
+                   ("@work" . ?w)
+                   ("@home" . ?h)
+                   (:endgroup . nil)
+                   )
+
    )
 
   :bind
@@ -457,6 +469,9 @@
    (",t" . org-toggle-checkbox)
    (",p" . org-pomodoro)
    (",r" . org-refile)
+   (",g" . org-set-tags-command)
+   (",ci" . org-clock-in)
+   (",co" . org-clock-out)
    (",a" . org-archive-subtree-default)
    :map global-leader-map
    ("oa" . org-agenda)
@@ -465,6 +480,7 @@
    ("oio" . org-clock-report)
    ("or" . org-refile)
    ("oo" . org-capture)
+   ("os" . org-save-all-org-buffers)
    ("ot" . org-todo-list)
    )
   )
@@ -485,13 +501,8 @@
 (use-package org-agenda
   :straight nil
   :after org
-  :config
-  (define-key org-agenda-mode-map (kbd ".") gtd-local-map)
   :bind
   (
-   :map gtd-local-map
-   ("s" . org-agenda-schedule)
-   ("d" . org-agenda-deadline)
    :map org-agenda-mode-map
    ("," . nil)
    (",," . org-agenda-todo)
@@ -500,6 +511,9 @@
    (",d" . org-agenda-deadline)
    (",p" . org-pomodoro)
    (",a" . org-agenda-archive-default)
+   (",ci" . org-agenda-clock-in)
+   (",co" . org-agenda-clock-out)
+   (",g" . org-agenda-set-tags)
    ))
 
 ;; org标题美化
@@ -611,7 +625,6 @@
 (defun gremacs/load-emacs-init ()
   (interactive)
   (load-file "~/.emacs.d/init.el"))
-
 
 ;; 通用的快捷键绑定
 (define-key global-leader-map "ff" 'find-file)
