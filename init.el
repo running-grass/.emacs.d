@@ -441,7 +441,7 @@
                       "~/org/journal.org"
                       "~/org/tickler.org")
    org-capture-templates '(("t" "Todo" entry (file+headline "~/org/inbox.org" "Inbox") "* TODO %?\n  %i\n  %a")
-			   ("j" "日记" entry (file+datetree "~/org/journal.org" "Journal") "* %?\nEntered on %U\n  %i\n  %a"))
+			                     ("j" "日记" entry (file+datetree "~/org/journal.org" "Journal") "* %?\nEntered on %U\n  %i\n  %a"))
    org-refile-targets '(("~/org/task.org" :level . 1)
                         ("~/org/project.org" :maxlevel . 2)
                         ("~/org/someday.org" :level . 1)
@@ -452,12 +452,32 @@
    org-log-refile nil
    org-tag-alist '(
                    (:startgroup . nil)
-                   ("@work" . ?w)
+                   ("@office" . ?o)
                    ("@home" . ?h)
                    (:endgroup . nil)
                    )
 
    )
+  (setq org-agenda-custom-commands
+        '(("o" "At the office" tags-todo "@office"
+           ((org-agenda-overriding-header "Office")
+            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))))
+
+  (defun my-org-agenda-skip-all-siblings-but-first ()
+    "跳过除第一个未完成条目之外的所有条目。"
+    (let (should-skip-entry)
+      (unless (org-current-is-todo)
+        (setq should-skip-entry t))
+      (save-excursion
+        (while (and (not should-skip-entry) (org-goto-sibling t))
+          (when (org-current-is-todo)
+            (setq should-skip-entry t))))
+      (when should-skip-entry
+        (or (outline-next-heading)
+            (goto-char (point-max))))))
+
+  (defun org-current-is-todo ()
+    (string= "TODO" (org-get-todo-state)))
 
   :bind
   (
@@ -616,6 +636,11 @@
   :straight nil
   :config
   (setq tramp-persistency-file-name "~/.emacs.d/.cache/tramp"))
+
+(use-package alert
+  :config
+  (setq alert-default-style 'osx-notifier)
+  )
 
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
