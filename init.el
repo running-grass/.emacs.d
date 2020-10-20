@@ -308,8 +308,13 @@
   :init
   (setq evil-want-keybinding nil)
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-  :hook (after-init . evil-mode )
+  :hook
+  (after-init . evil-mode )
   :config
+  (setq evil-default-state 'emacs)
+  (evil-set-initial-state 'prog-mode 'normal)
+  (evil-set-initial-state 'text-mode 'normal)
+  (evil-set-initial-state 'special-mode 'emacs)
   (progn
 
     (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
@@ -320,6 +325,7 @@
     (define-key evil-motion-state-map (kbd "RET") nil)
     (define-key evil-emacs-state-map  (kbd "RET") nil)
 
+    (define-key Info-mode-map  (kbd "SPC") nil)
     ;; 把，作为本地模式的保留按键
     (define-key evil-normal-state-map (kbd ",") nil)
     (define-key evil-motion-state-map (kbd ",") nil)
@@ -336,6 +342,7 @@
    :map evil-visual-state-map
    ("RET" . nil)
    ("," . nil)
+   ("SPC" . nil)
    ("SPC" . global-leader-map)
    ("f" . indent-region)
    )
@@ -642,6 +649,11 @@
   (setq alert-default-style 'osx-notifier)
   )
 
+(use-package ebdb
+  :config
+  (setq ebdb-mua-auto-update-p nil)
+  )
+
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
   (interactive)
@@ -650,6 +662,7 @@
 (defun gremacs/load-emacs-init ()
   (interactive)
   (load-file "~/.emacs.d/init.el"))
+
 
 ;; 通用的快捷键绑定
 (define-key global-leader-map "ff" 'find-file)

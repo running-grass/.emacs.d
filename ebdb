@@ -1,0 +1,50 @@
+;; Object ebdb-db-file-1ff81610c34c
+;; EBDB file-persistent database
+(ebdb-db-file "ebdb-db-file-1ff81610c34c"
+:file "ebdb"
+:label "File: ebdb"
+:uuid
+(ebdb-field-uuid "ebdb-field-uuid-1ff8160d22a0"
+:uuid "1144ABC6-1344-4A24-977F-744C8727947E")
+:sync-time '(24462 22574 913835 0)
+:records
+(list
+(ebdb-record-person "ebdb-record-person-1ff815da448a"
+:uuid
+(ebdb-field-uuid "ebdb-field-uuid-1ff8160d22ae"
+:uuid "27FFC97B-E947-4555-8D35-CBC7F8B88CE2")
+:creation-date
+(ebdb-field-creation-date "ebdb-field-creation-date-1ff8160d22b4"
+:timestamp '(24462 22142 20998 0))
+:timestamp
+(ebdb-field-timestamp "ebdb-field-timestamp-1ff8160d22b2"
+:timestamp '(24462 22742 742730 0))
+:fields
+(list
+(ebdb-field-anniversary "ebdb-field-anniversary-1ff815d95cac"
+:label "birthday"
+:date '(9 5 1991))
+(ebdb-field-language "ebdb-field-language-1ff8160d22b8"
+:language "Chinese-GB18030"))
+:mail
+(list
+(ebdb-field-mail "ebdb-field-mail-1ff8160d22c6"
+:mail "1137827731@qq.com"))
+:phone
+(list
+(ebdb-field-phone "ebdb-field-phone-1ff8160d22c8"
+:label "other"
+:number "17600711345")
+(ebdb-field-phone "ebdb-field-phone-1ff8160d22f0"
+:label "home"
+:number "18210496257"))
+:name
+(ebdb-field-name-complex "ebdb-field-name-complex-1ff8160d2318"
+:surname "高娜娜")
+:aka
+(list
+(ebdb-field-name-complex "ebdb-field-name-complex-1ff8160d232e"
+:surname "高娜")
+(ebdb-field-name-simple "ebdb-field-name-simple-1ff8160d233c"
+:name "娜娜"))))
+:record-class ebdb-record-person)
