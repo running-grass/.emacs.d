@@ -454,7 +454,10 @@
                         ("~/org/someday.org" :level . 1)
                         ("~/org/love.org" :level . 1)
                         ("~/org/tickler.org" :maxlevel . 1))
-   org-todo-keywords '((sequence "TODO(t!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)"))
+   org-todo-keywords '(
+                       (sequence "TODO(t!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)")
+                       (sequence "TOBEDEV(0!)" "DEVELOPING(i!)" "VERIFY(v!)" "PASS(p!)" "MERGED(m!)" "|" )
+                       )
    org-clock-string-limit 1
    org-log-refile nil
    org-tag-alist '(
@@ -652,6 +655,16 @@
 (use-package ebdb
   :config
   (setq ebdb-mua-auto-update-p nil)
+  )
+
+(use-package company-tabnine
+  :config
+  (add-to-list 'company-backends #'company-tabnine)
+  ;; Trigger completion immediately.
+  (setq company-idle-delay 0)
+
+  ;; Number the candidates (use M-1, M-2 etc to select completions).
+  (setq company-show-numbers t)
   )
 
 ;; 打开emacs的初始化文件
