@@ -14,6 +14,10 @@
 (setq org-agenda-include-diary nil)
 
 
+;; (setq my-lisp-dir "/Users/grass/.emacs.d/develop.el")
+;; (setq load-path (cons my-lisp-dir load-path))
+
+
 ;; 初始化straight
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -36,8 +40,8 @@
 (setq use-package-compute-statistics t)
 
 ;; 启动时全屏
-(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-  (toggle-frame-fullscreen))
+;; (unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
+  ;; (toggle-frame-fullscreen))
 
 ;; 初始化一些全局变量
 ;; 设置2个空格
@@ -56,8 +60,9 @@
 (defvar gtd-local-map (make-sparse-keymap)
   "自己和gtd相关的快捷键映射表")
 (define-key global-leader-map (kbd "o") gtd-local-map)
+(define-key global-map (kbd "M-SPC") global-leader-map)
 
-(set-frame-font "Source Code Pro 16" nil t)
+(set-frame-font "Source Code Pro 20" nil t)
 
 
 ;; 快捷键提示
@@ -193,7 +198,10 @@
 ;; 注释/反注释
 (use-package newcomment
   :straight nil
-  :bind (:map global-leader-map ( "cl" . comment-or-uncomment))
+  :bind (
+         :map global-leader-map
+         ( "/" . comment-or-uncomment)
+         )
   :config
   (defun comment-or-uncomment ()
     (interactive)
@@ -237,8 +245,8 @@
   :init
   (setq
    recentf-save-file "~/.emacs.d/.local/recentf"
-   recentf-max-saved-items 200
-   recentf-max-menu-items 15)
+   recentf-max-saved-items 2000
+   recentf-max-menu-items 150)
   :hook (after-init . recentf-mode)
   )
 
@@ -282,7 +290,7 @@
   :config
   (setq
    projectile-known-projects-file "~/.emacs.d/.cache/projectile-bookmarks.eld"
-   projectile-project-search-path '("~/mugeda/" "~/workspace/" "~/org")
+   projectile-project-search-path '("~/mugeda/" "~/workspace/" "~/")
    )
   (projectile-discover-projects-in-search-path)
   :bind
@@ -304,58 +312,48 @@
 	 ))
 
 ;; 设置evil
-(use-package evil
-  :init
-  (setq evil-want-keybinding nil)
-  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-  :hook
-  (after-init . evil-mode )
-  :config
-  (setq evil-default-state 'emacs)
-  (evil-set-initial-state 'prog-mode 'normal)
-  (evil-set-initial-state 'text-mode 'normal)
-  (evil-set-initial-state 'special-mode 'emacs)
-  (progn
+;; (use-package evil
+;;   :init
+;;   (setq evil-want-keybinding nil)
+;;   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+;;   :hook
+;;   (after-init . evil-mode )
+;;   :config
+;;   (setq evil-default-state 'emacs)
+;;   ;; (evil-set-initial-state 'prog-mode 'normal)
+;;   ;; (evil-set-initial-state 'text-mode 'normal)
+;;   ;; (evil-set-initial-state 'special-mode 'emacs)
+;;   (progn
 
-    (define-key evil-normal-state-map (kbd "SPC") global-leader-map)
-    (define-key evil-motion-state-map (kbd "SPC") global-leader-map)
-    (define-key evil-emacs-state-map  (kbd "SPC") global-leader-map)
+;;     (define-key evil-emacs-state-map  (kbd "M-p") global-leader-map)
 
-    (define-key evil-normal-state-map (kbd "RET") nil)
-    (define-key evil-motion-state-map (kbd "RET") nil)
-    (define-key evil-emacs-state-map  (kbd "RET") nil)
-
-    (define-key Info-mode-map  (kbd "SPC") nil)
-    ;; 把，作为本地模式的保留按键
-    (define-key evil-normal-state-map (kbd ",") nil)
-    (define-key evil-motion-state-map (kbd ",") nil)
-    (define-key evil-emacs-state-map  (kbd ",") nil)
-
-    (define-key evil-insert-state-map (kbd ",") 'self-insert-command)
-    )
-  :bind
-  (
-   :map global-leader-map
-   ("wv" . evil-window-vsplit)
-   ("wh" . evil-window-split)
-   ("bd" . evil-delete-buffer)
-   :map evil-visual-state-map
-   ("RET" . nil)
-   ("," . nil)
-   ("SPC" . nil)
-   ("SPC" . global-leader-map)
-   ("f" . indent-region)
-   )
-  )
+;;     ;; 把，作为本地模式的保留按键
+;;     (define-key evil-emacs-state-map  (kbd "M-,") nil)
+;;     )
+;;   :bind
+;;   (
+;;    :map global-leader-map
+;;    ("wv" . evil-window-vsplit)
+;;    ("wh" . evil-window-split)
+;;    ("bd" . evil-delete-buffer)
+;;    :map evil-visual-state-map
+;;    ("RET" . nil)
+;;    ("," . nil)
+;;    ("SPC" . nil)
+;;    ("SPC" . global-leader-map)
+;;    ("f" . indent-region)
+;;    ("/" . comment-or-uncomment)
+;;    )
+;;   )
 
 ;; 为常用包配置evil按键
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
+;; (use-package evil-collection
+;;   :after evil
+;;   :config
+;;   (evil-collection-init))
 
-(use-package treemacs-evil
-  :after treemacs)
+;; (use-package treemacs-evil
+;;   :after treemacs)
 
 ;; 设置amx，命令快速查找
 (use-package amx
@@ -441,37 +439,42 @@
   :config
   (setq
    org-directory "~/org/"
+   org-startup-folded 'content
    ;; org-agenda-files (list "~/org/")
    org-agenda-files '("~/org/inbox.org"
                       "~/org/task.org"
+                      "~/org/issues.org"
                       "~/org/project.org"
                       "~/org/journal.org"
                       "~/org/tickler.org")
-   org-capture-templates '(("t" "Todo" entry (file+headline "~/org/inbox.org" "Inbox") "* TODO %?\n  %i\n  %a")
-			                     ("j" "日记" entry (file+datetree "~/org/journal.org" "Journal") "* %?\nEntered on %U\n  %i\n  %a"))
    org-refile-targets '(("~/org/task.org" :level . 1)
                         ("~/org/project.org" :maxlevel . 2)
                         ("~/org/someday.org" :level . 1)
                         ("~/org/love.org" :level . 1)
                         ("~/org/tickler.org" :maxlevel . 1))
    org-todo-keywords '(
-                       (sequence "TODO(t!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)")
-                       (sequence "TOBEDEV(0!)" "DEVELOPING(i!)" "VERIFY(v!)" "PASS(p!)" "MERGED(m!)" "|" )
+                       (sequence "TODO(t!)" "DOING(e!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)")
+                       (sequence "MERGED(m!)" "|" )
+                       (sequence "REPORT(r!)" "|" )
                        )
-   org-clock-string-limit 1
-   org-log-refile nil
+   org-clock-string-limit 5
+   org-log-refile 'time
+   org-log-done 'note
+   org-log-into-drawer "LOGBOOK"
+   org-clock-stored-history t
    org-tag-alist '(
                    (:startgroup . nil)
                    ("@office" . ?o)
                    ("@home" . ?h)
                    (:endgroup . nil)
                    )
+   org-capture-templates '(("t" "Todo" entry (file+headline "~/org/inbox.org" "Inbox") "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:RELATED: %a\n:END:")
+			                     ("j" "日记" entry (file+datetree "~/org/journal.org" "Journal") "* %?\n:PROPERTIES:\n:CREATED: %U\n:RELATED: %a\n:END:"))
 
+   org-agenda-custom-commands '(("p" "At the office" tags-todo "project"
+      ((org-agenda-overriding-header "Office")
+       (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first))))
    )
-  (setq org-agenda-custom-commands
-        '(("o" "At the office" tags-todo "@office"
-           ((org-agenda-overriding-header "Office")
-            (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first)))))
 
   (defun my-org-agenda-skip-all-siblings-but-first ()
     "跳过除第一个未完成条目之外的所有条目。"
@@ -487,7 +490,31 @@
             (goto-char (point-max))))))
 
   (defun org-current-is-todo ()
-    (string= "TODO" (org-get-todo-state)))
+    (org-entry-is-todo-p))
+
+  (with-eval-after-load 'org-capture
+    (defun org-hugo-new-subtree-post-capture-template ()
+      "Return `org-capture' template string for new Hugo post."
+      (let* ((date (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)))
+             (title (read-from-minibuffer "Post Title: "))
+             (file-name (read-from-minibuffer "File Name: "))
+             (fname (org-hugo-slug file-name)))
+        (mapconcat #'identity
+                   `(
+                     ,(concat "* TODO " title)
+                     ":PROPERTIES:"
+                     ,(concat ":EXPORT_FILE_NAME: " fname)
+                     ,(concat ":EXPORT_DATE: " date)
+                     ":END:"
+                     "%?\n")
+                   "\n")))
+
+    (add-to-list 'org-capture-templates
+                 '("h"
+                   "Hugo post"
+                   entry
+                   (file+olp "~/workspace/blog/post.org" "Blog Ideas")
+                   (function org-hugo-new-subtree-post-capture-template))))
 
   :bind
   (
@@ -504,14 +531,12 @@
    (",co" . org-clock-out)
    (",a" . org-archive-subtree-default)
    :map global-leader-map
-   ("oa" . org-agenda)
+   ("a" . org-agenda)
+   ("c" . org-capture)
    ("oci" . org-clock-in)
    ("oco" . org-clock-out)
-   ("oio" . org-clock-report)
-   ("or" . org-refile)
-   ("oo" . org-capture)
+   ("ocp" . org-pomodoro)
    ("os" . org-save-all-org-buffers)
-   ("ot" . org-todo-list)
    )
   )
 
@@ -583,12 +608,12 @@
   (doom-modeline-mode 1))
 
 ;; 快速选择工具
-(use-package expand-region
-  :after evil
-  :bind
-  (:map evil-visual-state-map
-	("v" . er/expand-region))
-  )
+;; (use-package expand-region
+;;   :after evil
+;;   :bind
+;;   (:map evil-visual-state-map
+;; 	("v" . er/expand-region))
+;;   )
 ;; 增加文件的行号
 (use-package linum
   :config
@@ -610,27 +635,18 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
+(use-package org-web-tools
+  :straight (org-web-tools
+             :host github
+             :repo "alphapapa/org-web-tools"
+             :fork (:host github
+                          :repo "running-grass/org-web-tools")
+             ))
+
 (use-package pocket-reader
   :bind
   (:map global-leader-map
 	("lp" . pocket-reader)))
-
-;; 配置editorconfig
-(use-package editorconfig
-  :config
-  (editorconfig-mode 1))
-
-;; 配置vue支持
-(use-package vue-mode
-  :mode "\\.vue\\'"
-  )
-
-;; 配置emmet-mode
-;; 默认为C-j展开
-(use-package emmet-mode
-  :hook html-mode
-  :hook css-mode
-  )
 
 ;; 配置swiper
 (use-package swiper
@@ -657,15 +673,31 @@
   (setq ebdb-mua-auto-update-p nil)
   )
 
-(use-package company-tabnine
-  :config
-  (add-to-list 'company-backends #'company-tabnine)
-  ;; Trigger completion immediately.
-  (setq company-idle-delay 0)
+;; (use-package company-tabnine
+;;   :config
+;;   (add-to-list 'company-backends #'company-tabnine)
+;;   ;; Trigger completion immediately.
+;;   (setq company-idle-delay 0)
 
-  ;; Number the candidates (use M-1, M-2 etc to select completions).
-  (setq company-show-numbers t)
+;;   ;; Number the candidates (use M-1, M-2 etc to select completions).
+;;   (setq company-show-numbers t)
+;;   )
+
+(use-package ox-hugo
+  :after ox
+  :hook (org. org-hugo-auto-export-mode)
+
+  :config
+  (setq org-hugo-section "post"
+        org-hugo-auto-set-lastmod	t
+        )
+  ;; (org-hugo-auto-export-mode)
   )
+
+;; (use-package cnfonts
+;;   :config
+;;   (cnfonts-enable))
+
 
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
@@ -675,6 +707,12 @@
 (defun gremacs/load-emacs-init ()
   (interactive)
   (load-file "~/.emacs.d/init.el"))
+
+(use-package ledger-mode
+  :ensure-system-package ledger
+  )
+
+(use-package magit)
 
 
 ;; 通用的快捷键绑定
@@ -691,6 +729,7 @@
 (define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
 
 
+(load-file "~/.emacs.d/develop.el")
 
 (provide 'init)
 ;; init.el ends here
