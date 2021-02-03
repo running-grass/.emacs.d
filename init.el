@@ -11,11 +11,6 @@
 
 ;;关闭启动画面
 (setq inhibit-startup-message t)
-(setq org-agenda-include-diary nil)
-
-
-;; (setq my-lisp-dir "/Users/grass/.emacs.d/develop.el")
-;; (setq load-path (cons my-lisp-dir load-path))
 
 
 ;; 初始化straight
@@ -39,10 +34,6 @@
 ;; use-package初始化
 (setq use-package-compute-statistics t)
 
-;; 启动时全屏
-;; (unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-  ;; (toggle-frame-fullscreen))
-
 ;; 初始化一些全局变量
 ;; 设置2个空格
 (setq-default indent-tabs-mode nil)
@@ -57,9 +48,6 @@
 (defvar global-leader-map (make-sparse-keymap)
   "全局Leader快捷键映射表")
 
-(defvar gtd-local-map (make-sparse-keymap)
-  "自己和gtd相关的快捷键映射表")
-(define-key global-leader-map (kbd "o") gtd-local-map)
 (define-key global-map (kbd "M-SPC") global-leader-map)
 
 (set-frame-font "Source Code Pro 20" nil t)
@@ -74,31 +62,10 @@
   (setq which-key-idle-delay 1)
   (setq which-key-idle-secondary-delay 0.05)
 
-  ;; 替换快捷键提示符
-  (push '(("\\(.*\\) 0" . "winum-select-window-0") . ("\\1 0..9" . "window 0..9"))
-	which-key-replacement-alist)
-  ;; 忽略winum-select-window-[1-9]这9个提示
-  (push '((nil . "winum-select-window-[1-9]") . t) which-key-replacement-alist)
   (which-key-mode)
   )
 
 ;; 内置模块的一些功能
-
-;; 窗口的撤销/恢复功能
-(use-package winner-mode
-  :straight nil
-  :hook (after-init . winner-mode)
-  :bind
-  (:map global-leader-map
-	("wz" . winner-undo)
-	("wZ" . winner-redo)
-	))
-
-(use-package dired
-  :straight nil
-  :config
-  (define-key dired-mode-map (kbd "SPC") global-leader-map)
-  )
 
 ;; 保存了上一次打开文件时的光标位置
 (use-package saveplace
@@ -106,13 +73,6 @@
   :init
   (setq save-place-file "~/.emacs.d/.local/places")
   :hook (after-init . save-place-mode))
-
-;; buffer相关的设置
-(use-package ibuffer
-  :straight nil
-  :bind
-  (:map global-leader-map
-	("bg" . ibuffer)))
 
 ;; 高亮当前行
 (use-package hl-line
@@ -123,18 +83,9 @@
 (use-package hideshow
   :straight nil
   :hook (prog-mode . hs-minor-mode)
-  :bind (
-	 :map global-leader-map
-         ("TAB" . hs-toggle-hiding)
-         )
+  :bind
+  ("C-c TAB" . hs-toggle-hiding)
   )
-
-;; 保存折叠状态
-;; (use-package persistent-overlays
-;;   :init
-;;   (setq persistent-overlays-directory "~/.emacs.d/.cache")
-;;   :hook (hs-minor-mode . persistent-overlays-minor-mode)
-;;   )
 
 ;; 简单文件指示
 (use-package simple
@@ -152,9 +103,6 @@
   :config
   (face-spec-set 'whitespace-tab
                  '((t :background unspecified)))
-  ;; For some reason use face-defface-spec as spec-type doesn't work.  My guess
-  ;; is it's due to the variables with the same name as the faces in
-  ;; whitespace.el.  Anyway, we have to manually set some attribute to
   ;; unspecified here.
   (face-spec-set 'whitespace-line
                  '((((background light))
@@ -198,10 +146,8 @@
 ;; 注释/反注释
 (use-package newcomment
   :straight nil
-  :bind (
-         :map global-leader-map
-         ( "/" . comment-or-uncomment)
-         )
+  :bind
+  ( "C-c /" . comment-or-uncomment)
   :config
   (defun comment-or-uncomment ()
     (interactive)
@@ -228,16 +174,6 @@
   :config
   (setq show-paren-when-point-inside-paren t
         show-paren-when-point-in-periphery t))
-
-;; 窗口切换
-(use-package window
-  :straight nil
-  :bind
-  (:map global-leader-map
-	("wd" . delete-window)
-	("wo" . delete-other-windows)
-	)
-  )
 
 ;; 最近打开的文件
 (use-package recentf
@@ -294,13 +230,11 @@
    )
   (projectile-discover-projects-in-search-path)
   :bind
-  (:map global-leader-map
-	("pf" . counsel-projectile-find-file )
-	("pP" . counsel-projectile-switch-open-project)
-	("pp" . counsel-projectile-switch-project)
-	("pb" . counsel-projectile-switch-to-buffer)
-	("ps" . counsel-projectile-ag)
-	))
+	("C-c p f" . counsel-projectile-find-file )
+	("C-c p p" . counsel-projectile-switch-project)
+	("C-c p b" . counsel-projectile-switch-to-buffer)
+	("C-c p s" . counsel-projectile-ag)
+	)
 
 (use-package treemacs-projectile
   :config
@@ -311,68 +245,22 @@
        ("0" . treemacs-select-window)
 	 ))
 
-;; 设置evil
-;; (use-package evil
-;;   :init
-;;   (setq evil-want-keybinding nil)
-;;   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-;;   :hook
-;;   (after-init . evil-mode )
-;;   :config
-;;   (setq evil-default-state 'emacs)
-;;   ;; (evil-set-initial-state 'prog-mode 'normal)
-;;   ;; (evil-set-initial-state 'text-mode 'normal)
-;;   ;; (evil-set-initial-state 'special-mode 'emacs)
-;;   (progn
-
-;;     (define-key evil-emacs-state-map  (kbd "M-p") global-leader-map)
-
-;;     ;; 把，作为本地模式的保留按键
-;;     (define-key evil-emacs-state-map  (kbd "M-,") nil)
-;;     )
-;;   :bind
-;;   (
-;;    :map global-leader-map
-;;    ("wv" . evil-window-vsplit)
-;;    ("wh" . evil-window-split)
-;;    ("bd" . evil-delete-buffer)
-;;    :map evil-visual-state-map
-;;    ("RET" . nil)
-;;    ("," . nil)
-;;    ("SPC" . nil)
-;;    ("SPC" . global-leader-map)
-;;    ("f" . indent-region)
-;;    ("/" . comment-or-uncomment)
-;;    )
-;;   )
-
-;; 为常用包配置evil按键
-;; (use-package evil-collection
-;;   :after evil
-;;   :config
-;;   (evil-collection-init))
-
-;; (use-package treemacs-evil
-;;   :after treemacs)
-
 ;; 设置amx，命令快速查找
 (use-package amx
   :after ivy
   :init
   (setq amx-save-file "~/.emacs.d/.local/amx-items")
   :bind
-  (:map global-leader-map
-	("SPC" . amx))
+	("M-x" . amx)
   )
 
 ;; 快速跳转
 (use-package avy
   :bind
-  (:map global-leader-map
-	("jj" . avy-goto-char-timer)
-	("jc" . avy-goto-char)
-	("jl" . avy-goto-line)
-	))
+	("C-c j j" . avy-goto-char-timer)
+	("C-c j c" . avy-goto-char)
+	("C-c j l" . avy-goto-line)
+	)
 
 ;; 括号的多色彩
 (use-package rainbow-delimiters
@@ -400,30 +288,6 @@
   (global-company-mode 1)
   )
 
-;; 为窗口绑定序号
-(use-package winum
-  :config
-  (defun winum-assign-0-to-neotree ()
-    (when (string-match-p (buffer-name) ".*Neotree.*") 0))
-  (add-to-list 'winum-assign-functions 'winum-assign-0-to-neotree)
-  (winum-mode)
-  :bind
-  (
-   :map global-leader-map
-   ;; 选择窗口
-   ("1" . winum-select-window-1)
-   ("2" . winum-select-window-2)
-   ("3" . winum-select-window-3)
-   ("4" . winum-select-window-4)
-   ("5" . winum-select-window-5)
-   ("6" . winum-select-window-6)
-   ("7" . winum-select-window-7)
-   ("8" . winum-select-window-8)
-   ("9" . winum-select-window-9)
-   )
-  )
-
-
 ;; 窗口切换
 (use-package ace-window
   :init
@@ -434,172 +298,8 @@
 	)
   )
 
-;; Org模式相关的，和GTD相关的
-(use-package org
-  :config
-  (setq
-   org-directory "~/org/"
-   org-startup-folded 'content
-   ;; org-agenda-files (list "~/org/")
-   org-agenda-files '("~/org/inbox.org"
-                      "~/org/task.org"
-                      "~/org/issues.org"
-                      "~/org/project.org"
-                      "~/org/journal.org"
-                      "~/org/tickler.org")
-   org-refile-targets '(("~/org/task.org" :level . 1)
-                        ("~/org/project.org" :maxlevel . 2)
-                        ("~/org/someday.org" :level . 1)
-                        ("~/org/love.org" :level . 1)
-                        ("~/org/tickler.org" :maxlevel . 1))
-   org-todo-keywords '(
-                       (sequence "TODO(t!)" "DOING(e!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)")
-                       (sequence "MERGED(m!)" "|" )
-                       (sequence "REPORT(r!)" "|" )
-                       )
-   org-clock-string-limit 5
-   org-log-refile 'time
-   org-log-done 'note
-   org-log-into-drawer "LOGBOOK"
-   org-clock-stored-history t
-   org-tag-alist '(
-                   (:startgroup . nil)
-                   ("@office" . ?o)
-                   ("@home" . ?h)
-                   (:endgroup . nil)
-                   )
-   org-capture-templates '(("t" "Todo" entry (file+headline "~/org/inbox.org" "Inbox") "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:RELATED: %a\n:END:")
-			                     ("j" "日记" entry (file+datetree "~/org/journal.org" "Journal") "* %?\n:PROPERTIES:\n:CREATED: %U\n:RELATED: %a\n:END:"))
-
-   org-agenda-custom-commands '(("p" "At the office" tags-todo "project"
-      ((org-agenda-overriding-header "Office")
-       (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first))))
-   )
-
-  (defun my-org-agenda-skip-all-siblings-but-first ()
-    "跳过除第一个未完成条目之外的所有条目。"
-    (let (should-skip-entry)
-      (unless (org-current-is-todo)
-        (setq should-skip-entry t))
-      (save-excursion
-        (while (and (not should-skip-entry) (org-goto-sibling t))
-          (when (org-current-is-todo)
-            (setq should-skip-entry t))))
-      (when should-skip-entry
-        (or (outline-next-heading)
-            (goto-char (point-max))))))
-
-  (defun org-current-is-todo ()
-    (org-entry-is-todo-p))
-
-  (with-eval-after-load 'org-capture
-    (defun org-hugo-new-subtree-post-capture-template ()
-      "Return `org-capture' template string for new Hugo post."
-      (let* ((date (format-time-string (org-time-stamp-format :long :inactive) (org-current-time)))
-             (title (read-from-minibuffer "Post Title: "))
-             (file-name (read-from-minibuffer "File Name: "))
-             (fname (org-hugo-slug file-name)))
-        (mapconcat #'identity
-                   `(
-                     ,(concat "* TODO " title)
-                     ":PROPERTIES:"
-                     ,(concat ":EXPORT_FILE_NAME: " fname)
-                     ,(concat ":EXPORT_DATE: " date)
-                     ":END:"
-                     "%?\n")
-                   "\n")))
-
-    (add-to-list 'org-capture-templates
-                 '("h"
-                   "Hugo post"
-                   entry
-                   (file+olp "~/workspace/blog/post.org" "Blog Ideas")
-                   (function org-hugo-new-subtree-post-capture-template))))
-
-  :bind
-  (
-   :map org-mode-map
-   ("," . nil)
-   (",," . org-todo)
-   (",s" . org-schedule)
-   (",d" . org-deadline)
-   (",t" . org-toggle-checkbox)
-   (",p" . org-pomodoro)
-   (",r" . org-refile)
-   (",g" . org-set-tags-command)
-   (",ci" . org-clock-in)
-   (",co" . org-clock-out)
-   (",a" . org-archive-subtree-default)
-   :map global-leader-map
-   ("a" . org-agenda)
-   ("c" . org-capture)
-   ("oci" . org-clock-in)
-   ("oco" . org-clock-out)
-   ("ocp" . org-pomodoro)
-   ("os" . org-save-all-org-buffers)
-   )
-  )
-
-;; 番茄钟
-(use-package org-pomodoro
-  :after org
-  :bind
-  (
-   :map gtd-local-map
-   ("p" . org-pomodoro)
-   )
-  )
-
-
-
-;; 绑定快捷键
-(use-package org-agenda
-  :straight nil
-  :after org
-  :bind
-  (
-   :map org-agenda-mode-map
-   ("," . nil)
-   (",," . org-agenda-todo)
-   (",s" . org-agenda-schedule)
-   (",r" . org-agenda-refile)
-   (",d" . org-agenda-deadline)
-   (",p" . org-pomodoro)
-   (",a" . org-agenda-archive-default)
-   (",ci" . org-agenda-clock-in)
-   (",co" . org-agenda-clock-out)
-   (",g" . org-agenda-set-tags)
-   ))
-
-;; org标题美化
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode))
-
 (use-package helm
   :defer t)
-;; 支持redmine
-(use-package org-redmine
-  :config
-  (setq
-   org-redmine-limit 100 ; 列表请求条数
-   org-redmine-uri "http://redmine.mugeda.com" ; redmine域名
-   org-redmine-auth-api-key "63535623b7f690f8c12c8c94b1d827466196cb9a" ; redmine的Api
-   org-redmine-template-anything-source "#%i% (%d_date%) [%p_n%] %s% @%as_n%" ; issue列表展示模板
-   )
-  (defun org-redmine-show-mine-issue ()
-    ;; "展示分配给我的Issue"
-    (interactive)
-    ;; 可选参数 是否为只加载自己的issue
-    (org-redmine-helm-show-issue-all t))
-  :bind
-  (
-   :map global-leader-map
-	 ("lr" . 'org-redmine-show-mine-issue)
-	 ("lR" . 'org-redmine-helm-show-issue-all)
-   :map org-mode-map
-	 (",ir" . 'org-redmine-get-issue))
-  )
 
 ;; 美化modeline
 (use-package doom-modeline
@@ -608,12 +308,12 @@
   (doom-modeline-mode 1))
 
 ;; 快速选择工具
-;; (use-package expand-region
-;;   :after evil
-;;   :bind
-;;   (:map evil-visual-state-map
-;; 	("v" . er/expand-region))
-;;   )
+(use-package expand-region
+  :after evil
+  :bind
+	("C-c C-e" . er/expand-region)
+  )
+
 ;; 增加文件的行号
 (use-package linum
   :config
@@ -626,8 +326,6 @@
 (use-package wakatime-mode
   :config
   (global-wakatime-mode))
-
-
 
 ;; 记录命令使用次数
 (use-package keyfreq
@@ -642,17 +340,6 @@
              :fork (:host github
                           :repo "running-grass/org-web-tools")
              ))
-
-(use-package pocket-reader
-  :bind
-  (:map global-leader-map
-	("lp" . pocket-reader)))
-
-;; 配置swiper
-(use-package swiper
-  :bind
-  (:map global-leader-map
-	("fs" . swiper-isearch)))
 
 (use-package ggtags
   :ensure-system-package global
@@ -673,19 +360,9 @@
   (setq ebdb-mua-auto-update-p nil)
   )
 
-;; (use-package company-tabnine
-;;   :config
-;;   (add-to-list 'company-backends #'company-tabnine)
-;;   ;; Trigger completion immediately.
-;;   (setq company-idle-delay 0)
-
-;;   ;; Number the candidates (use M-1, M-2 etc to select completions).
-;;   (setq company-show-numbers t)
-;;   )
-
 (use-package ox-hugo
   :after ox
-  :hook (org. org-hugo-auto-export-mode)
+  :hook (org . org-hugo-auto-export-mode)
 
   :config
   (setq org-hugo-section "post"
@@ -726,10 +403,13 @@
 (define-key global-leader-map "hk" 'describe-key)
 (define-key global-leader-map "hK" 'describe-keymap)
 
+
 (define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
 
+(global-set-key (kbd "C-c j n") 'goto-line)
 
 (load-file "~/.emacs.d/develop.el")
+(load-file "~/.emacs.d/wiki.el")
 
 (provide 'init)
 ;; init.el ends here
