@@ -88,25 +88,19 @@
 
   :bind
   (
+   ("C-c o s" . org-save-all-org-buffers)
    :map org-mode-map
-   ("," . nil)
-   (",," . org-todo)
-   (",s" . org-schedule)
-   (",d" . org-deadline)
-   (",t" . org-toggle-checkbox)
-   (",p" . org-pomodoro)
-   (",r" . org-refile)
-   (",g" . org-set-tags-command)
-   (",ci" . org-clock-in)
-   (",co" . org-clock-out)
-   (",a" . org-archive-subtree-default)
-   :map global-leader-map
-   ("a" . org-agenda)
-   ("c" . org-capture)
-   ("oci" . org-clock-in)
-   ("oco" . org-clock-out)
-   ("ocp" . org-pomodoro)
-   ("os" . org-save-all-org-buffers)
+   ("C-; C-;" . org-todo)
+   ("C-; C-s" . org-schedule)
+   ("C-; C-d" . org-deadline)
+   ("C-; C-" . org-toggle-checkbox)
+   ("C-; C-p" . org-pomodoro)
+   ("C-; C-r" . org-refile)
+   ("C-; r" . org-refile-to-eof)
+   ("C-; C-t" . org-set-tags-command)
+   ("C-; C-i" . org-clock-in)
+   ("C-; C-o" . org-clock-out)
+   ("C-; C-a" . org-archive-subtree-default)
    )
   )
 
@@ -114,10 +108,8 @@
 (use-package org-pomodoro
   :after org
   :bind
-  ("C-c g p" . org-pomodoro)
+  ("C-c o p" . org-pomodoro)
   )
-
-
 
 ;; 绑定快捷键
 (use-package org-agenda
@@ -126,16 +118,15 @@
   :bind
   (
    :map org-agenda-mode-map
-   ("," . nil)
-   (",," . org-agenda-todo)
-   (",s" . org-agenda-schedule)
-   (",r" . org-agenda-refile)
-   (",d" . org-agenda-deadline)
-   (",p" . org-pomodoro)
-   (",a" . org-agenda-archive-default)
-   (",ci" . org-agenda-clock-in)
-   (",co" . org-agenda-clock-out)
-   (",g" . org-agenda-set-tags)
+   ("C-; C-;" . org-agenda-todo)
+   ("C-; C-s" . org-agenda-schedule)
+   ("C-; C-r" . org-agenda-refile)
+   ("C-; C-d" . org-agenda-deadline)
+   ("C-; C-p" . org-pomodoro)
+   ("C-; C-a" . org-agenda-archive-default)
+   ("C-; C-i" . org-agenda-clock-in)
+   ("C-; C-o" . org-agenda-clock-out)
+   ("C-; C-t" . org-agenda-set-tags)
    ))
 
 ;; org标题美化
@@ -179,7 +170,8 @@
         (find-file path)
         (end-of-buffer)
         ;; 调用org-paste-subtree粘贴进去
-        (org-paste-subtree)))))
+        (org-paste-subtree)
+        ))))
 
 ;; refile到文件末尾
 (setq *org-refile-eof--helm-source*
@@ -187,6 +179,5 @@
         (candidates . org-agenda-files)
         (action . (lambda (candidate)
                     candidate))))
-
 
 (provide 'wiki)

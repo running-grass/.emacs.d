@@ -12,7 +12,6 @@
 ;;关闭启动画面
 (setq inhibit-startup-message t)
 
-
 ;; 初始化straight
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -45,10 +44,6 @@
 
 (setq bookmark-default-file "~/.emacs.d/.cache/bookmarks")
 ;; 定义全局的leader-map
-(defvar global-leader-map (make-sparse-keymap)
-  "全局Leader快捷键映射表")
-
-(define-key global-map (kbd "M-SPC") global-leader-map)
 
 (set-frame-font "Source Code Pro 20" nil t)
 
@@ -139,9 +134,9 @@
   :config (global-so-long-mode 1))
 
 ;; 文件被外部程序修改后，重新载入buffer
-(use-package autorevert
-  :straight nil
-  :hook (after-init . global-auto-revert-mode))
+;; (use-package autorevert
+;;   :straight nil
+;;   :hook (after-init . global-auto-revert-mode))
 
 ;; 注释/反注释
 (use-package newcomment
@@ -206,10 +201,6 @@
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
 
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-  (doom-themes-treemacs-config)
-
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config)
   )
@@ -218,9 +209,9 @@
 (use-package all-the-icons)
 
 ;; 自动保存
-(use-package super-save
-  :config
-  (super-save-mode +1))
+;; (use-package super-save
+;;   :config
+;;   (super-save-mode +1))
 
 (use-package counsel-projectile
   :config
@@ -235,15 +226,6 @@
 	("C-c p b" . counsel-projectile-switch-to-buffer)
 	("C-c p s" . counsel-projectile-ag)
 	)
-
-(use-package treemacs-projectile
-  :config
-  :bind
-  (
-   :map global-leader-map
-       ("pt" . treemacs-projectile)
-       ("0" . treemacs-select-window)
-	 ))
 
 ;; 设置amx，命令快速查找
 (use-package amx
@@ -277,25 +259,12 @@
   ;; 可以使switch-buffer集成recentf
   (setq ivy-use-virtual-buffers t)
   :hook (after-init . ivy-mode)
-  :bind
-  (:map global-leader-map
-	("bb" . ivy-switch-buffer)
-	))
+)
 
 ;; 自动补全
 (use-package company
   :config
   (global-company-mode 1)
-  )
-
-;; 窗口切换
-(use-package ace-window
-  :init
-  (setq aw-dispatch-always nil)
-  :bind
-  (:map global-leader-map
-	("ww" . ace-window)
-	)
   )
 
 (use-package helm
@@ -309,9 +278,8 @@
 
 ;; 快速选择工具
 (use-package expand-region
-  :after evil
   :bind
-	("C-c C-e" . er/expand-region)
+	("C-s-e" . er/expand-region)
   )
 
 ;; 增加文件的行号
@@ -385,28 +353,14 @@
   (interactive)
   (load-file "~/.emacs.d/init.el"))
 
-(use-package ledger-mode
-  :ensure-system-package ledger
-  )
-
 (use-package magit)
 
 
 ;; 通用的快捷键绑定
-(define-key global-leader-map "ff" 'find-file)
-(define-key global-leader-map "fe" '("emacs file"))
-(define-key global-leader-map "fei" '("打开Emacs配置文件" . gremacs/open-emacs-init))
-(define-key global-leader-map "fer" '("重新加载Emacs配置文件" . gremacs/load-emacs-init))
-(define-key global-leader-map "hp" 'describe-package)
-(define-key global-leader-map "hf" 'describe-function)
-(define-key global-leader-map "hv" 'describe-variable)
-(define-key global-leader-map "hk" 'describe-key)
-(define-key global-leader-map "hK" 'describe-keymap)
-
-
-(define-key global-leader-map "qq" '("退出Emacs" . save-buffers-kill-emacs))
 
 (global-set-key (kbd "C-c j n") 'goto-line)
+(global-set-key (kbd "C-c f e i") 'gremacs/open-emacs-init)
+(global-set-key (kbd "C-c f e r") 'gremacs/load-emacs-init)
 
 (load-file "~/.emacs.d/develop.el")
 (load-file "~/.emacs.d/wiki.el")

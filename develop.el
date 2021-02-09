@@ -9,6 +9,8 @@
 ;; 配置vue支持
 (use-package vue-mode
   :mode "\\.vue\\'"
+  :config
+  (setq js-indent-level 2)
   )
 
 ;; 配置emmet-mode
@@ -34,11 +36,11 @@
   (setq lsp-keymap-prefix "C-c l")
   ;; (setq lsp--tcp-server-port 5000)
 
-  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-         (js-mode . lsp)
+  ;; :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         ;; (js-mode . lsp)
          ;; if you want which-key integration
          ;; (lsp-mode . lsp-enable-which-key-integration))
-         )
+         ;; )
   :commands lsp)
 
 ;; optionally
