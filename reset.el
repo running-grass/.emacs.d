@@ -22,5 +22,7 @@
 
 (set-frame-font "Source Code Pro 20" 14 t)
 
+;; 添加nix的执行路径
+(add-to-list 'exec-path "~/.nix-profile/bin")
 
-(provide 'rese)
+(provide 'reset)

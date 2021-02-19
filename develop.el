@@ -3,6 +3,7 @@
 
 ;; 配置editorconfig
 (use-package editorconfig
+  :defer t
   :config
   (editorconfig-mode 1))
 
@@ -31,6 +32,7 @@
   )
 
 (use-package lsp-mode
+  :defer t
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
@@ -43,19 +45,9 @@
          ;; )
   :commands lsp)
 
-;; optionally
-;; (use-package lsp-ui :commands lsp-ui-mode)
-;; if you are ivy user
-;; (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
-;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-;; optionally if you want to use debugger
-;; (use-package dap-mode)
-;; (use-package dap-LANGUAGE) to load the dap adapter for your language
-
-
 ;; plantuml
 (use-package plantuml-mode
+  :defer t
   :config
   (setq plantuml-executable-path "~/.nix-profile/bin/plantuml")
   (setq plantuml-jar-path "~/.nix-profile/lib/plantuml.jar")
@@ -70,7 +62,9 @@
   )
 
 
+
 (use-package tramp
+  :defer t
   :straight nil
   :config
   (setq tramp-persistency-file-name "~/.emacs.d/.cache/tramp"))
@@ -78,6 +72,7 @@
 
 ;; 快速选择工具
 (use-package expand-region
+  :defer t
   :bind
 	("C-c e" . er/expand-region)
   )
@@ -85,6 +80,7 @@
 
 ;; ivy智能提示后端
 (use-package ivy
+  :defer t
   :config
   ;; 可以使switch-buffer集成recentf
   (setq ivy-use-virtual-buffers t)
@@ -93,6 +89,7 @@
 
 ;; 自动补全
 (use-package company
+  :defer t
   :config
   (global-company-mode 1)
   )
@@ -100,12 +97,14 @@
 
 ;; 括号的多色彩
 (use-package rainbow-delimiters
+  :defer t
   :hook (prog-mode . rainbow-delimiters-mode)
   )
 
 
 ;; 高亮显示配对的大括号
 (use-package paren
+  :defer t
   :straight nil
   :hook (after-init . show-paren-mode)
   :config
@@ -115,6 +114,7 @@
 
 ;; 注释/反注释
 (use-package newcomment
+  :defer t
   :straight nil
   :bind
   ( "C-c /" . comment-or-uncomment)
@@ -144,6 +144,9 @@
   ("C-c TAB" . hs-toggle-hiding)
   )
 
+(use-package ranger)
+
+(use-package treemacs)
 ;; project config
 (use-package projectile
   :init
@@ -156,6 +159,10 @@
   :bind
   (:map projectile-mode-map
         ("C-c p" . projectile-command-map)))
-
-
+(use-package helm-ag)
+(use-package helm-projectile
+  :after projectile
+  :config
+  (helm-projectile-on)
+  )
 (provide 'develop)

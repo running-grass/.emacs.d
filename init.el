@@ -25,6 +25,7 @@
 
 ;; use-package初始化
 (setq use-package-compute-statistics t)
+(setq use-package-always-defer t)
 
 ;; 快捷键提示
 (use-package which-key
@@ -34,14 +35,15 @@
   (setq which-key-show-early-on-C-h t)
   (setq which-key-idle-delay 1)
   (setq which-key-idle-secondary-delay 0.05)
-
-  (which-key-mode)
+  :hook 
+  (after-init . which-key-mode)
   )
 
 ;; 内置模块的一些功能
 
 ;; 保存了上一次打开文件时的光标位置
 (use-package saveplace
+  :defer t
   :straight nil
   :init
   (setq save-place-file "~/.emacs.d/.local/places")
@@ -49,21 +51,25 @@
 
 ;; 高亮当前行
 (use-package hl-line
+  :defer t
   :straight nil
   :hook (after-init . global-hl-line-mode))
 
 ;; 文件被外部程序修改后，重新载入buffer
 (use-package autorevert
+  :defer t
   :straight nil
   :hook (after-init . global-auto-revert-mode))
 
 ;; 选中后直接输入，不用删除
 (use-package delsel
+  :defer t
   :straight nil
   :hook (after-init . delete-selection-mode))
 
 ;; 最近打开的文件
 (use-package recentf
+  :defer t
   :straight nil
   :init
   (setq
@@ -74,16 +80,21 @@
   )
 
 (use-package exec-path-from-shell
+  :defer t
   :if (memq window-system '(mac ns))
   :config
   (exec-path-from-shell-initialize))
 
-(use-package use-package-ensure-system-package)
+(use-package use-package-ensure-system-package
+  :defer t)
 
-(use-package ag :ensure-system-package ag)
+(use-package ag
+  :defer t
+  :ensure-system-package ag)
 
 ;; 设置主题
 (use-package doom-themes
+  :defer nil
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
@@ -98,15 +109,19 @@
   )
 
 ;; 安装icon管理
-(use-package all-the-icons)
+(use-package all-the-icons
+  :defer t
+  )
 
 ;; 自动保存
 (use-package super-save
+  :defer t
   :config
   (super-save-mode +1))
 
 ;; 设置amx，命令快速查找
 (use-package amx
+  :defer t
   :after ivy
   :init
   (setq amx-save-file "~/.emacs.d/.local/amx-items")
@@ -116,6 +131,7 @@
 
 ;; 快速跳转
 (use-package avy
+  :defer t
   :bind
 	("C-c j j" . avy-goto-char-timer)
 	("C-c j c" . avy-goto-char)
@@ -124,6 +140,7 @@
 
 ;; 搜索统计
 (use-package anzu
+  :defer t
   :hook (after-init . global-anzu-mode))
 
 
@@ -138,29 +155,31 @@
 
 ;; 增加文件的行号
 (use-package linum
+  :hook (after-init . global-linum-mode)
   :config
-  (global-linum-mode t)
   (setq linum-format "%4d  ")
   (set-face-background 'linum nil)
   )
 
 ;; wakatime
 (use-package wakatime-mode
-  :config
-  (global-wakatime-mode))
+  :hook (after-init . global-wakatime-mode))
 
 ;; 记录命令使用次数
 (use-package keyfreq
+  :defer nil
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
 (use-package alert
+  :defer nil
   :config
   (setq alert-default-style 'osx-notifier)
   )
 
 (use-package ox-hugo
+  :defer t
   :after ox
   :hook (org . org-hugo-auto-export-mode)
 
@@ -171,22 +190,40 @@
   )
 
 ;; 打开emacs的初始化文件
-(defun gremacs/open-emacs-init ()
+(defun grass/open-emacs-init ()
   (interactive)
   (find-file-existing "~/.emacs.d/init.el"))
 ;; 加载emacs的初始化文件
-(defun gremacs/load-emacs-init ()
+(defun grass/load-emacs-init ()
   (interactive)
   (load-file "~/.emacs.d/init.el"))
 
-(use-package magit
-  :hook after-init
-  )
+(defun grass/open-line-next ()
+  (interactive)
+  (progn
+  (move-end-of-line 1)
+  (newline)
+  (indent-for-tab-command)))
+
+(defun grass/open-line-prev ()
+  (interactive)
+  (progn
+  (move-beginning-of-line 1)
+  (newline)
+  (previous-line)
+  (indent-for-tab-command)))
+
+
+(use-package magit)
 
 ;; 通用的快捷键绑定
 (global-set-key (kbd "C-c j n") 'goto-line)
-(global-set-key (kbd "C-c f e i") 'gremacs/open-emacs-init)
-(global-set-key (kbd "C-c f e r") 'gremacs/load-emacs-init)
+(global-set-key (kbd "C-c f e i") 'grass/open-emacs-init)
+(global-set-key (kbd "C-c f e r") 'grass/load-emacs-init)
+(global-set-key (kbd "<C-return>") 'grass/open-line-next)
+(global-set-key (kbd "<S-return>") 'grass/open-line-prev)
+
+
 
 (load-file "~/.emacs.d/develop.el")
 (load-file "~/.emacs.d/wiki.el")
