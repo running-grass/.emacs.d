@@ -57,11 +57,105 @@
 ;; plantuml
 (use-package plantuml-mode
   :config
-  (add-to-list
-   'org-src-lang-modes '("plantuml" . plantuml))
-
   (setq plantuml-executable-path "~/.nix-profile/bin/plantuml")
+  (setq plantuml-jar-path "~/.nix-profile/lib/plantuml.jar")
   (setq plantuml-default-exec-mode 'executable)
+  (setq org-plantuml-exec-mode 'executable)
+  (setq org-plantuml-jar-path "~/.nix-profile/lib/plantuml.jar")
+  (setq plantuml-executable-args '(
+                                   "-headless"
+                                   "-charset"
+                                   "UTF-8"
+                                   ))
   )
+
+
+(use-package tramp
+  :straight nil
+  :config
+  (setq tramp-persistency-file-name "~/.emacs.d/.cache/tramp"))
+
+
+;; 快速选择工具
+(use-package expand-region
+  :bind
+	("C-c e" . er/expand-region)
+  )
+
+
+;; ivy智能提示后端
+(use-package ivy
+  :config
+  ;; 可以使switch-buffer集成recentf
+  (setq ivy-use-virtual-buffers t)
+  :hook (after-init . ivy-mode)
+)
+
+;; 自动补全
+(use-package company
+  :config
+  (global-company-mode 1)
+  )
+
+
+;; 括号的多色彩
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+
+
+;; 高亮显示配对的大括号
+(use-package paren
+  :straight nil
+  :hook (after-init . show-paren-mode)
+  :config
+  (setq show-paren-when-point-inside-paren t
+        show-paren-when-point-in-periphery t))
+
+
+;; 注释/反注释
+(use-package newcomment
+  :straight nil
+  :bind
+  ( "C-c /" . comment-or-uncomment)
+  :config
+  (defun comment-or-uncomment ()
+    (interactive)
+    (if (region-active-p)
+        (comment-or-uncomment-region (region-beginning) (region-end))
+      (if (save-excursion
+            (beginning-of-line)
+            (looking-at "\\s-*$"))
+          (call-interactively 'comment-dwim)
+        (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
+  :custom
+  (comment-auto-fill-only-comments t))
+
+;; 当某个文件的某一行特别长的时候，自动优化性能
+(use-package so-long
+  :straight nil
+  :config (global-so-long-mode 1))
+
+;; 显示/隐藏结构化的数据
+(use-package hideshow
+  :straight nil
+  :hook (prog-mode . hs-minor-mode)
+  :bind
+  ("C-c TAB" . hs-toggle-hiding)
+  )
+
+;; project config
+(use-package projectile
+  :init
+  (setq
+   projectile-known-projects-file "~/.emacs.d/.cache/projectile-bookmarks.eld"
+   projectile-project-search-path '("~/mugeda/" "~/workspace/" "~/")
+   )
+  :hook
+  (after-init . projectile-mode)
+  :bind
+  (:map projectile-mode-map
+        ("C-c p" . projectile-command-map)))
+
 
 (provide 'develop)

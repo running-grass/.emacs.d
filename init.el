@@ -3,14 +3,7 @@
 
 ;;; Code:
 
-;; 关闭工具栏，tool-bar-mode 即为一个 Minor Mode
-(tool-bar-mode -1)
-
-;; 关闭文件滑动控件
-(scroll-bar-mode -1)
-
-;;关闭启动画面
-(setq inhibit-startup-message t)
+(load-file "~/.emacs.d/reset.el")
 
 ;; 初始化straight
 (defvar bootstrap-version)
@@ -32,21 +25,6 @@
 
 ;; use-package初始化
 (setq use-package-compute-statistics t)
-
-;; 初始化一些全局变量
-;; 设置2个空格
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 2)
-(setq-default default-tab-width 2)
-
-;; 默认查找目录为home目录
-(setq command-line-default-directory "~")
-
-(setq bookmark-default-file "~/.emacs.d/.cache/bookmarks")
-;; 定义全局的leader-map
-
-(set-frame-font "Source Code Pro 20" nil t)
-
 
 ;; 快捷键提示
 (use-package which-key
@@ -74,101 +52,15 @@
   :straight nil
   :hook (after-init . global-hl-line-mode))
 
-;; 显示/隐藏结构化的数据
-(use-package hideshow
-  :straight nil
-  :hook (prog-mode . hs-minor-mode)
-  :bind
-  ("C-c TAB" . hs-toggle-hiding)
-  )
-
-;; 简单文件指示
-(use-package simple
-  :straight nil
-  :hook (after-init . (lambda ()
-                        (line-number-mode)
-                        (column-number-mode)
-                        (size-indication-mode))))
-
-;; 显示空白字符
-(use-package whitespace
-  :straight nil
-  :hook (after-init . global-whitespace-mode)
-
-  :config
-  (face-spec-set 'whitespace-tab
-                 '((t :background unspecified)))
-  ;; unspecified here.
-  (face-spec-set 'whitespace-line
-                 '((((background light))
-                    :background "#d8d8d8" :foreground unspecified
-                    :underline t :weight unspecified)
-                   (t
-                    :background "#404040" :foreground unspecified
-                    :underline t :weight unspecified)))
-
-  ;; Use softer visual cue for space before tabs.
-  (face-spec-set 'whitespace-space-before-tab
-                 '((((background light))
-                    :background "#d8d8d8" :foreground "#de4da1")
-                   (t
-                    :inherit warning
-                    :background "#404040" :foreground "#ee6aa7")))
-
-  (setq
-   whitespace-line-column nil
-   whitespace-style
-   '(face		; visualize things below:
-     empty		; empty lines at beginning/end of buffer
-     lines-tail	; lines go beyond `fill-column'
-     space-before-tab	; spaces before tab
-     trailing           ; trailing blanks
-     ;; tabs		; tabs (show by face)
-     ;; tab-mark		; tabs (show by symbol)
-     ))
-  )
-
-;; 当某个文件的某一行特别长的时候，自动优化性能
-(use-package so-long
-  :straight nil
-  :config (global-so-long-mode 1))
-
 ;; 文件被外部程序修改后，重新载入buffer
-;; (use-package autorevert
-;;   :straight nil
-;;   :hook (after-init . global-auto-revert-mode))
-
-;; 注释/反注释
-(use-package newcomment
+(use-package autorevert
   :straight nil
-  :bind
-  ( "C-c /" . comment-or-uncomment)
-  :config
-  (defun comment-or-uncomment ()
-    (interactive)
-    (if (region-active-p)
-        (comment-or-uncomment-region (region-beginning) (region-end))
-      (if (save-excursion
-            (beginning-of-line)
-            (looking-at "\\s-*$"))
-          (call-interactively 'comment-dwim)
-        (comment-or-uncomment-region (line-beginning-position) (line-end-position)))))
-  :custom
-  (comment-auto-fill-only-comments t))
-
+  :hook (after-init . global-auto-revert-mode))
 
 ;; 选中后直接输入，不用删除
 (use-package delsel
   :straight nil
   :hook (after-init . delete-selection-mode))
-
-;; 高亮显示配对的大括号
-(use-package paren
-  :straight nil
-  :hook (after-init . show-paren-mode)
-  :config
-  (setq show-paren-when-point-inside-paren t
-        show-paren-when-point-in-periphery t))
 
 ;; 最近打开的文件
 (use-package recentf
@@ -209,23 +101,9 @@
 (use-package all-the-icons)
 
 ;; 自动保存
-;; (use-package super-save
-;;   :config
-;;   (super-save-mode +1))
-
-(use-package counsel-projectile
+(use-package super-save
   :config
-  (setq
-   projectile-known-projects-file "~/.emacs.d/.cache/projectile-bookmarks.eld"
-   projectile-project-search-path '("~/mugeda/" "~/workspace/" "~/")
-   )
-  (projectile-discover-projects-in-search-path)
-  :bind
-	("C-c p f" . counsel-projectile-find-file )
-	("C-c p p" . counsel-projectile-switch-project)
-	("C-c p b" . counsel-projectile-switch-to-buffer)
-	("C-c p s" . counsel-projectile-ag)
-	)
+  (super-save-mode +1))
 
 ;; 设置amx，命令快速查找
 (use-package amx
@@ -244,28 +122,10 @@
 	("C-c j l" . avy-goto-line)
 	)
 
-;; 括号的多色彩
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode)
-  )
-
 ;; 搜索统计
 (use-package anzu
   :hook (after-init . global-anzu-mode))
 
-;; ivy智能提示后端
-(use-package ivy
-  :config
-  ;; 可以使switch-buffer集成recentf
-  (setq ivy-use-virtual-buffers t)
-  :hook (after-init . ivy-mode)
-)
-
-;; 自动补全
-(use-package company
-  :config
-  (global-company-mode 1)
-  )
 
 (use-package helm
   :defer t)
@@ -275,12 +135,6 @@
   :init
   (setq doom-modeline-modal-icon t)
   (doom-modeline-mode 1))
-
-;; 快速选择工具
-(use-package expand-region
-  :bind
-	("C-s-e" . er/expand-region)
-  )
 
 ;; 增加文件的行号
 (use-package linum
@@ -301,31 +155,9 @@
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
-(use-package org-web-tools
-  :straight (org-web-tools
-             :host github
-             :repo "alphapapa/org-web-tools"
-             :fork (:host github
-                          :repo "running-grass/org-web-tools")
-             ))
-
-(use-package ggtags
-  :ensure-system-package global
-  )
-
-(use-package tramp
-  :straight nil
-  :config
-  (setq tramp-persistency-file-name "~/.emacs.d/.cache/tramp"))
-
 (use-package alert
   :config
   (setq alert-default-style 'osx-notifier)
-  )
-
-(use-package ebdb
-  :config
-  (setq ebdb-mua-auto-update-p nil)
   )
 
 (use-package ox-hugo
@@ -336,13 +168,7 @@
   (setq org-hugo-section "post"
         org-hugo-auto-set-lastmod	t
         )
-  ;; (org-hugo-auto-export-mode)
   )
-
-;; (use-package cnfonts
-;;   :config
-;;   (cnfonts-enable))
-
 
 ;; 打开emacs的初始化文件
 (defun gremacs/open-emacs-init ()
@@ -353,11 +179,11 @@
   (interactive)
   (load-file "~/.emacs.d/init.el"))
 
-(use-package magit)
-
+(use-package magit
+  :hook after-init
+  )
 
 ;; 通用的快捷键绑定
-
 (global-set-key (kbd "C-c j n") 'goto-line)
 (global-set-key (kbd "C-c f e i") 'gremacs/open-emacs-init)
 (global-set-key (kbd "C-c f e r") 'gremacs/load-emacs-init)

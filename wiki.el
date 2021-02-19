@@ -45,6 +45,11 @@
       ((org-agenda-overriding-header "Office")
        (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first))))
    )
+  ;; (org-babel-do-load-languages
+  ;;     'org-babel-load-languages
+  ;;     '((emacs-lisp . t)
+  ;;       (plantuml . t)
+  ;;       ))
 
   (defun my-org-agenda-skip-all-siblings-but-first ()
     "跳过除第一个未完成条目之外的所有条目。"
@@ -89,18 +94,6 @@
   :bind
   (
    ("C-c o s" . org-save-all-org-buffers)
-   :map org-mode-map
-   ("C-; C-;" . org-todo)
-   ("C-; C-s" . org-schedule)
-   ("C-; C-d" . org-deadline)
-   ("C-; C-" . org-toggle-checkbox)
-   ("C-; C-p" . org-pomodoro)
-   ("C-; C-r" . org-refile)
-   ("C-; r" . org-refile-to-eof)
-   ("C-; C-t" . org-set-tags-command)
-   ("C-; C-i" . org-clock-in)
-   ("C-; C-o" . org-clock-out)
-   ("C-; C-a" . org-archive-subtree-default)
    )
   )
 
@@ -110,24 +103,6 @@
   :bind
   ("C-c o p" . org-pomodoro)
   )
-
-;; 绑定快捷键
-(use-package org-agenda
-  :straight nil
-  :after org
-  :bind
-  (
-   :map org-agenda-mode-map
-   ("C-; C-;" . org-agenda-todo)
-   ("C-; C-s" . org-agenda-schedule)
-   ("C-; C-r" . org-agenda-refile)
-   ("C-; C-d" . org-agenda-deadline)
-   ("C-; C-p" . org-pomodoro)
-   ("C-; C-a" . org-agenda-archive-default)
-   ("C-; C-i" . org-agenda-clock-in)
-   ("C-; C-o" . org-agenda-clock-out)
-   ("C-; C-t" . org-agenda-set-tags)
-   ))
 
 ;; org标题美化
 (use-package org-superstar
