@@ -25,7 +25,6 @@
 
 ;; use-package初始化
 (setq use-package-compute-statistics t)
-(setq use-package-always-defer t)
 
 ;; 快捷键提示
 (use-package which-key
@@ -224,9 +223,14 @@
 (global-set-key (kbd "<S-return>") 'grass/open-line-prev)
 
 
+;; (setq custom-file nil)
+
+(setq custom-file "~/.emacs.d/.local/emacs-custom.el")
 
 (load-file "~/.emacs.d/develop.el")
 (load-file "~/.emacs.d/wiki.el")
 
+;; (load custom-file)
+
+
 (provide 'init)
-;; init.el ends here

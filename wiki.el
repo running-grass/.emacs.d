@@ -1,6 +1,8 @@
 ;;; package -- wiki
 ;;; Commentary:
 
+(defvar gtd-map (make-sparse-keymap) "所有gtd相关的全局操作都在这里")
+(fset 'gtd-command-map gtd-map)
 (setq org-agenda-include-diary nil)
 
 ;; Org模式相关的，和GTD相关的
@@ -10,22 +12,14 @@
    org-directory "~/org/"
    org-startup-folded 'content
    ;; org-agenda-files (list "~/org/")
-   org-agenda-files '("~/org/inbox.org"
-                      "~/org/task.org"
-                      "~/org/issues.org"
-                      "~/org/project.org"
-                      "~/org/journal.org"
-                      "~/org/tickler.org"
-                      "~/org/org-roam/daily/")
+   org-agenda-files '("~/org")
    org-refile-targets '(("~/org/task.org" :level . 1)
                         ("~/org/project.org" :maxlevel . 2)
                         ("~/org/someday.org" :level . 1)
                         ("~/org/love.org" :level . 1)
                         ("~/org/tickler.org" :maxlevel . 1))
    org-todo-keywords '(
-                       (sequence "TODO(t!)" "DOING(e!)" "WAITING(w@)" "|" "DONE(d!)" "CANCELLED(c@)")
-                       (sequence "MERGED(m!)" "|" )
-                       (sequence "REPORT(r!)" "|" )
+                       (sequence "TODO(t)" "|" "DONE(d!)" "CANCELLED(c@)")
                        )
    org-clock-string-limit 5
    org-log-refile 'time
@@ -45,11 +39,37 @@
       ((org-agenda-overriding-header "Office")
        (org-agenda-skip-function #'my-org-agenda-skip-all-siblings-but-first))))
    )
-  ;; (org-babel-do-load-languages
-  ;;     'org-babel-load-languages
-  ;;     '((emacs-lisp . t)
-  ;;       (plantuml . t)
-  ;;       ))
+
+  
+  (defvar dynamic-agenda-files nil
+    "dynamic generate agenda files list when changing org state")
+
+  (defun update-dynamic-agenda-hook ()
+    (let ((done (or (not org-state) ;; nil when no TODO list
+                    (member org-state org-done-keywords)))
+          (file (buffer-file-name))
+          (agenda (funcall (ad-get-orig-definition 'org-agenda-files)) ))
+      (unless (member file agenda)
+        (if done
+            (save-excursion
+              (goto-char (point-min))
+              ;; Delete file from dynamic files when all TODO entry changed to DONE
+              (unless (search-forward-regexp org-not-done-heading-regexp nil t)
+                (customize-save-variable
+                 'dynamic-agenda-files
+                 (cl-delete-if (lambda (k) (string= k file))
+                               dynamic-agenda-files))))
+          ;; Add this file to dynamic agenda files
+          (unless (member file dynamic-agenda-files)
+            (customize-save-variable 'dynamic-agenda-files
+                                     (add-to-list 'dynamic-agenda-files file)))))))
+
+  (defun dynamic-agenda-files-advice (orig-val)
+    (cl-union orig-val dynamic-agenda-files :test #'equal))
+
+  (advice-add 'org-agenda-files :filter-return #'dynamic-agenda-files-advice)
+  (add-to-list 'org-after-todo-state-change-hook 'update-dynamic-agenda-hook t)
+
 
   (defun my-org-agenda-skip-all-siblings-but-first ()
     "跳过除第一个未完成条目之外的所有条目。"
@@ -92,16 +112,20 @@
                    (function org-hugo-new-subtree-post-capture-template))))
 
   :bind
-  (
-   ("C-c o s" . org-save-all-org-buffers)
-   )
+  ("C-c n" . gtd-command-map)
+  (:map gtd-map
+        ("s" . org-save-all-org-buffers)
+        ("t" . org-todo-list)
+        ("a" . org-agenda-list)
+        )
   )
 
 ;; 番茄钟
 (use-package org-pomodoro
   :after org
   :bind
-  ("C-c o p" . org-pomodoro)
+  (:map gtd-map
+  ("p" . org-pomodoro))
   )
 
 ;; org标题美化
@@ -117,17 +141,10 @@
       :custom
       (org-roam-directory "~/org/org-roam/")
       :bind
-      (:map org-roam-mode-map
-            ("C-c n l" . org-roam)
-            ("C-c n f" . org-roam-find-file)
-            ("C-c n j" . org-roam-dailies-find-today)
-            ("C-c n g" . org-roam-graph))
-      (:map org-mode-map
-            ("C-c n i" . org-roam-insert)
-            ("C-c d" . org-roam-dailies-)
-            ("C-c n I" . org-roam-insert-immediate)))
-
-
+      (:map gtd-map
+            ("f" . org-roam-find-file)
+            ("j" . org-roam-dailies-find-today))
+      )
 
 
 ;;; 定义一个Helm的source，以便选择要粘贴的.org文件
