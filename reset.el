@@ -24,5 +24,6 @@
 
 ;; 添加nix的执行路径
 (add-to-list 'exec-path "~/.nix-profile/bin")
+(add-to-list 'exec-path "/usr/local/bin")
 
 (provide 'reset)

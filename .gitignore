@@ -15,5 +15,10 @@
 /straight
 cnfonts/
 url/
-org-roam.db
 .lsp-session-v1
+projectile.cache
+/eshell
+/elpa
+/org-roam.db
+.org-id-locations
+/transient

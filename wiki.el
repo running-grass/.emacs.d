@@ -125,7 +125,9 @@
   :after org
   :bind
   (:map gtd-map
-  ("p" . org-pomodoro))
+        ("p" . org-pomodoro))
+  (:map org-agenda-mode-map
+        ("C-c C-x C-p" . org-pomodoro))
   )
 
 ;; org标题美化

@@ -3,7 +3,6 @@
 
 ;; 配置editorconfig
 (use-package editorconfig
-  :defer t
   :config
   (editorconfig-mode 1))
 
@@ -80,7 +79,6 @@
 
 ;; ivy智能提示后端
 (use-package ivy
-  :defer t
   :config
   ;; 可以使switch-buffer集成recentf
   (setq ivy-use-virtual-buffers t)
@@ -89,7 +87,6 @@
 
 ;; 自动补全
 (use-package company
-  :defer t
   :config
   (global-company-mode 1)
   )
@@ -149,6 +146,7 @@
 (use-package treemacs)
 ;; project config
 (use-package projectile
+  :defer t
   :init
   (setq
    projectile-known-projects-file "~/.emacs.d/.cache/projectile-bookmarks.eld"

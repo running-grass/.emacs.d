@@ -166,13 +166,11 @@
 
 ;; 记录命令使用次数
 (use-package keyfreq
-  :defer nil
   :config
   (keyfreq-mode 1)
   (keyfreq-autosave-mode 1))
 
 (use-package alert
-  :defer nil
   :config
   (setq alert-default-style 'osx-notifier)
   )
@@ -230,7 +228,6 @@
 (load-file "~/.emacs.d/develop.el")
 (load-file "~/.emacs.d/wiki.el")
 
-;; (load custom-file)
-
+(load custom-file)
 
 (provide 'init)
