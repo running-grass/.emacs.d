@@ -68,8 +68,8 @@
     (cl-union orig-val dynamic-agenda-files :test #'equal))
 
   (advice-add 'org-agenda-files :filter-return #'dynamic-agenda-files-advice)
+  ;; 在org的todo状态变更时更新agenda列表
   (add-to-list 'org-after-todo-state-change-hook 'update-dynamic-agenda-hook t)
-
 
   (defun my-org-agenda-skip-all-siblings-but-first ()
     "跳过除第一个未完成条目之外的所有条目。"
@@ -128,6 +128,8 @@
         ("p" . org-pomodoro))
   (:map org-agenda-mode-map
         ("C-c C-x C-p" . org-pomodoro))
+  (:map org-mode-map
+        ("C-c C-x C-p" . org-pomodoro))
   )
 
 ;; org标题美化
@@ -137,16 +139,19 @@
 
 
 (use-package org-roam
-      :ensure t
-      :hook
-      (after-init . org-roam-mode)
-      :custom
-      (org-roam-directory "~/org/org-roam/")
-      :bind
-      (:map gtd-map
-            ("f" . org-roam-find-file)
-            ("j" . org-roam-dailies-find-today))
-      )
+  :ensure t
+  :after org
+  :hook
+  (after-init . org-roam-mode)
+  :custom
+  (org-roam-directory "~/org/org-roam/")
+  :bind
+  (:map gtd-map
+        ("f" . org-roam-find-file)
+        ("j" . org-roam-dailies-find-today))
+  :config
+  (setq org-all-files (f-files org-directory 'org-roam--org-file-p t))
+  )
 
 
 ;;; 定义一个Helm的source，以便选择要粘贴的.org文件
@@ -172,7 +177,7 @@
 ;; refile到文件末尾
 (setq *org-refile-eof--helm-source*
       '((name . "refile到下列的哪个文件")
-        (candidates . org-agenda-files)
+        (candidates . org-all-files)
         (action . (lambda (candidate)
                     candidate))))
 
