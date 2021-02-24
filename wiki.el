@@ -54,7 +54,10 @@
             (save-excursion
               (goto-char (point-min))
               ;; Delete file from dynamic files when all TODO entry changed to DONE
-              (unless (search-forward-regexp org-not-done-heading-regexp nil t)
+              (unless (and (search-forward-regexp org-not-done-headinqg-regexp nil t)
+                           (search-forward-regexp "SCHEDULED:" nil t)
+                           (search-forward-regexp "DEADLINE:" nil t)
+                           )
                 (customize-save-variable
                  'dynamic-agenda-files
                  (cl-delete-if (lambda (k) (string= k file))
