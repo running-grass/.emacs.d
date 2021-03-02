@@ -91,6 +91,43 @@
   :defer t
   :ensure-system-package ag)
 
+
+;; 设置输入法
+(use-package rime
+  :defer t
+  :custom
+  (default-input-method "rime")
+  (rime-librime-root "/nix/store/mppwz8hwdgcfc6j46g1ywdg0cy2gpf99-librime-1.5.3")
+  (rime-emacs-module-header-root "/nix/store/ihy79xiyvjlpb28pngcg5a0gkziwl0z5-emacs-27.1/include")
+  :config
+  (define-key rime-mode-map (kbd "s-C-i") 'rime-force-enable)
+  (setq rime-user-data-dir "~/Library/Rime")
+  (setq rime-share-data-dir "~/Library/Rime")
+  (setq rime-disable-predicates
+      '(rime-predicate-after-alphabet-char-p
+        rime-predicate-prog-in-code-p
+        rime-predicate-in-code-string-p
+        rime-predicate-hydra-p
+        rime-predicate-current-uppercase-letter-p
+        ))
+  )
+
+;; 
+;; (use-package! rime
+;;               :custom
+;;               (default-input-method "rime")
+;;               (rime-librime-root "~/Documents/emacs/depend/librime/dist")
+;;               (rime-emacs-module-header-root "/usr/local/opt/emacs-mac/include")
+;;               :config
+;;               (define-key rime-mode-map (kbd "C-i") 'rime-force-enable)
+;;               (setq rime-disable-predicates
+;;                     '(rime-predicate-evil-mode-p
+;;                       rime-predicate-after-alphabet-char-p
+;;                       rime-predicate-current-input-punctuation-p
+;;                       rime-predicate-current-uppercase-letter-p
+;;                       rime-predicate-punctuation-line-begin-p))
+;;               (setq rime-user-data-dir "~/Library/Rime"))
+
 ;; 设置主题
 (use-package doom-themes
   :defer nil

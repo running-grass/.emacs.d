@@ -7,6 +7,7 @@
 
 ;; Org模式相关的，和GTD相关的
 (use-package org
+  :defer 3
   :config
   (setq
    org-directory "~/org/"
@@ -23,7 +24,7 @@
                        )
    org-clock-string-limit 5
    org-log-refile 'time
-   org-log-done 'note
+   org-log-done 'time
    org-log-into-drawer "LOGBOOK"
    org-clock-stored-history t
    org-tag-alist '(
@@ -142,10 +143,7 @@
 
 
 (use-package org-roam
-  :ensure t
   :after org
-  :hook
-  (after-init . org-roam-mode)
   :custom
   (org-roam-directory "~/org/org-roam/")
   :bind
