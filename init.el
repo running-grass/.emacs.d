@@ -94,15 +94,14 @@
 
 ;; 设置输入法
 (use-package rime
-  :defer t
   :custom
   (default-input-method "rime")
+  (rime-user-data-dir "~/Library/Rime")
+  (rime-share-data-dir "~/Library/Rime")
   (rime-librime-root "/nix/store/mppwz8hwdgcfc6j46g1ywdg0cy2gpf99-librime-1.5.3")
   (rime-emacs-module-header-root "/nix/store/ihy79xiyvjlpb28pngcg5a0gkziwl0z5-emacs-27.1/include")
   :config
   (define-key rime-mode-map (kbd "s-C-i") 'rime-force-enable)
-  (setq rime-user-data-dir "~/Library/Rime")
-  (setq rime-share-data-dir "~/Library/Rime")
   (setq rime-disable-predicates
       '(rime-predicate-after-alphabet-char-p
         rime-predicate-prog-in-code-p
@@ -112,6 +111,15 @@
         ))
   )
 
+(use-package phi-search
+  :bind
+  (:map global-map
+        ([remap isearch-forward] . phi-search)
+        ([remap isearch-backward] . phi-search-backward)
+        
+        ([remap query-replace] . phi-replace-query)
+       )
+  )
 ;; 
 ;; (use-package! rime
 ;;               :custom
