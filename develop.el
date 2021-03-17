@@ -163,4 +163,16 @@
   :config
   (helm-projectile-on)
   )
+
+(use-package json-mode
+  :mode "\\.json\\'"
+  )
+(use-package evil :defer t)
+
+;; flutter
+(use-package dart-mode)
+(use-package lsp-dart)
+(use-package flutter)
+
+(use-package smarty-mode)
 (provide 'develop)

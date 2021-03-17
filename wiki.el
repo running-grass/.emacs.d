@@ -119,6 +119,7 @@
   ("C-c n" . gtd-command-map)
   (:map gtd-map
         ("s" . org-save-all-org-buffers)
+        ("c" . org-capture)
         ("t" . org-todo-list)
         ("a" . org-agenda-list)
         )
@@ -149,6 +150,7 @@
   :bind
   (:map gtd-map
         ("f" . org-roam-find-file)
+        ("i" . org-roam-insert)
         ("j" . org-roam-dailies-find-today))
   :config
   (setq org-all-files (f-files org-directory 'org-roam--org-file-p t))
