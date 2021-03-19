@@ -91,7 +91,6 @@
   :defer t
   :ensure-system-package ag)
 
-
 ;; 设置输入法
 (use-package rime
   :straight
@@ -116,7 +115,7 @@
         ))
   )
 
-;; 视同phi-search
+;; 因为要兼容 rime 的中文，使用 phi-search 来代替 i-search ，但是目前看来不太好用，和 anzu 的配合也不好
 (use-package phi-search
   :bind
   (:map global-map
@@ -259,6 +258,8 @@
    ;; SPC j/k will run the original command in MOTION state.
    '("j" . meow-motion-origin-command)
    '("k" . meow-motion-origin-command)
+   '("p" . projectile-command-map)
+   '("n" . gtd-command-map)
    ;; Use SPC (0-9) for digit arguments.
    '("1" . meow-digit-argument)
    '("2" . meow-digit-argument)
@@ -333,6 +334,7 @@
    '("Z" . meow-pop-all-selection)
    '("&" . meow-query-replace)
    '("%" . meow-query-replace-regexp)
+   '("/" . comment-or-uncomment)
    '("<escape>" . meow-last-buffer)))
 
 (use-package meow
